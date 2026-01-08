@@ -1,1 +1,1 @@
-# Fashion Stylist
+# StyleO
