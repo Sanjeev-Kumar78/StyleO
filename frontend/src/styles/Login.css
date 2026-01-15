@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+.login-page {
+  /* Divide page in two sections: left for image and right for form */
+  @apply flex h-screen w-screen;
+}
+
+.left-image-section {
+  /* Hidden Image for smaller screens otherwise full half screen image with switch buttons over it*/
+  @apply hidden md:flex w-1/2 relative bg-cover bg-center h-dvh;
+  /* hidden for smaller screens */
+}
+
+.left-image-section > .login-image {
+  /* full sized left captured with backdrop blur or shadow */
+  @apply w-full h-full object-cover brightness-90 shadow-lg shadow-gray-400 inset-1.5 sticky;
+}
+
+.left-image-section > .links-switch {
+  @apply absolute flex-col right-0 top-40;
+}
+
+.left-image-section > .links-switch-bottom {
+  @apply absolute flex-col right-0 top-60;
+}
+
+.left-image-section .switch-links .switch-button {
+  /* Rounded corners connected with the edges of the div in the left image section */
+  @apply bg-white/30 backdrop-blur-md text-white w-32 py-3.5 rounded-l-full rounded-r-none hover:bg-white/50 transition-all duration-300 font-bold tracking-wide shadow-lg border-none outline-none ring-0 cursor-pointer;
+}
+
+.left-image-section .switch-links .switch-button:active {
+  @apply scale-95;
+}
+
+/* Active state for current page */
+.left-image-section .switch-links.active .switch-button {
+  @apply bg-white/90 text-black w-36 shadow-xl scale-105;
+}
+.right-form-section {
+  /* Right side form section with white background and curved corner */
+  @apply md:flex md:w-1/2 w-full justify-center items-center h-full z-10;
+}
+
+.right-form-section > .form-container {
+  /* Container for logo and form */
+  @apply w-full justify-center max-w-sm px-6 flex flex-col items-center;
+}
+
+.right-form-section > .form-container > .app-logo {
+  /* App Logo */
+  @apply w-16 mb-6;
+}
+
+.login-form {
+  /* Form wrapper */
+  @apply w-full flex flex-col gap-6;
+}
+
+.login-form > .form-title {
+  /* Login Title */
+  @apply text-3xl font-bold text-white text-center mb-2;
+}
+
+.login-form > .form-input {
+  /* Input fields with bottom border only */
+  @apply w-full border-b-2 border-gray-200 h-12 rounded-md focus:outline-none focus:border-indigo-500 transition-colors bg-transparent;
+  border: double 2px transparent;
+  background-image: linear-gradient(#212121, #212121),
+    linear-gradient(
+      137.48deg,
+      #22d3ee 0%,
+      #a855f7 25%,
+      #e91e63 50%,
+      #d946ef 75%,
+      #06b6d4 100%
+    );
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+.login-form > .submit-button {
+  /* Login button - pill shaped and colored */
+  @apply w-full text-white font-bold h-12 rounded-full mt-4 shadow-lg transition-all;
+  border: double 2px transparent;
+  background-image: linear-gradient(#212121, #212121),
+    linear-gradient(
+      137.48deg,
+      #22d3ee 0%,
+      #a855f7 25%,
+      #e91e63 50%,
+      #d946ef 75%,
+      #06b6d4 100%
+    );
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+.login-form > .submit-button:hover {
+  background-image: linear-gradient(#3a3a3a, #3a3a3a),
+    linear-gradient(
+      137.48deg,
+      #22d3ee 0%,
+      #a855f7 25%,
+      #e91e63 50%,
+      #d946ef 75%,
+      #06b6d4 100%
+    );
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* Form Options - Remember me and Forgot Password */
+.login-form > .form-options {
+  @apply flex justify-between items-center -mt-2;
+}
+
+.form-options > .remember-me {
+  @apply flex items-center gap-2 cursor-pointer;
+}
+
+.remember-me > .checkbox {
+  @apply w-4 h-4 cursor-pointer accent-purple-500;
+}
+
+.remember-me > span {
+  @apply text-sm text-gray-400 select-none;
+}
+
+.form-options > .forgot-password {
+  @apply text-sm text-purple-400 hover:text-purple-300 transition-colors no-underline;
+}
+
+/* Divider */
+.login-form > .divider {
+  @apply relative flex items-center justify-center my-2;
+}
+
+.divider::before,
+.divider::after {
+  @apply flex-1 border-t border-gray-700;
+  content: "";
+}
+
+.divider > span {
+  @apply px-4 text-sm text-gray-500;
+}
+
+/* Social Login Buttons */
+.login-form > .social-login {
+  @apply flex gap-4;
+}
+
+.social-login > .social-button {
+  @apply flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-all border-2 border-gray-700 bg-transparent hover:bg-gray-800 text-white cursor-pointer;
+}
+
+.social-button > .social-icon {
+  @apply w-5 h-5;
+}
+
+/* Sign Up Link */
+.login-form > .signup-link {
+  @apply text-center text-sm text-gray-400 mt-2;
+}
+
+.signup-link > a {
+  @apply text-purple-400 hover:text-purple-300 font-semibold no-underline transition-colors;
+}

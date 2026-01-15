@@ -1,0 +1,9 @@
+@import "tailwindcss";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+li {
+  @apply list-none mr-4 ml-4 p-3 border-4;
+}
