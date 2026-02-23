@@ -1,15 +1,13 @@
 import { Link } from "react-router";
 import "../styles/NavBar.css";
+import ThemeButton from "./ThemeButton";
 
 const NavBar = () => {
   return (
-    <nav className="w-[100vw] h-16 bg-blue-300 flex flex-row">
-      <ul className="flex flex-row items-center p-5">
+    <nav>
+      <ul>
         <li>
           <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/login">Login</Link>
         </li>
         <li>
           <Link to="/about">About</Link>
@@ -17,6 +15,10 @@ const NavBar = () => {
         <li>
           <Link to="/contact">Contact</Link>
         </li>
+        <li>
+          <Link to="/login">Login</Link>
+        </li>
+        <ThemeButton />
       </ul>
     </nav>
   );

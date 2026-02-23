@@ -1,12 +1,24 @@
 @import "tailwindcss";
+
+html {
+  interpolate-size: allow-keywords;
+  color-scheme: dark;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: "Arial", sans-serif;
+  text-rendering: optimizeLegibility;
+  background-color: aliceblue;
+  color: #1b1b1b;
+}
+
+body.dark {
   background-color: #1b1b1b;
   color: #f2f2f2;
-  text-rendering: optimizeLegibility;
 }

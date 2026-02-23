@@ -1,9 +1,13 @@
-@import "tailwindcss";
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@reference "tailwindcss";
+
+nav {
+  @apply w-screen h-16 bg-gray-800 dark:bg-white flex flex-row items-center p-5;
 }
+
+ul {
+  @apply flex flex-row items-center;
+}
+
 li {
-  @apply list-none mr-4 ml-4 p-3 border-4;
+  @apply mx-4 text-gray-200 dark:text-gray-800;
 }
