@@ -3,6 +3,7 @@
 html {
   interpolate-size: allow-keywords;
   color-scheme: dark;
+  text-rendering: optimizeLegibility;
 }
 
 * {

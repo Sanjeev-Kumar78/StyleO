@@ -6,69 +6,87 @@ import F2 from "../assets/F2.jpg";
 import M1 from "../assets/M1.jpg";
 import M2 from "../assets/M2.jpg";
 import ThemeButton from "../components/ThemeButton";
-interface form {
+
+interface SignupForm {
+  name?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 }
-const Login: React.FC = () => {
-  // Models Image
+
+const Signup: React.FC = () => {
   const imagePath = [F1, F2, M1, M2];
   const [randomIdx] = useState<number>(() =>
     Math.floor(Math.random() * imagePath.length),
   );
-  // Form state
-  const [form, setForm] = useState<form>({});
+  const [form, setForm] = useState<SignupForm>({});
+  const [error, setError] = useState<string>("");
+
   const SubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Re-Rendered");
-    if (form.email && form.password) {
-      setForm({ email: form.email, password: form.password });
-    } else {
-      return <p>Please fill in all fields</p>;
+    setError("");
+    if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+      setError("Please fill in all fields.");
+      return;
     }
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    console.log("Sign up:", form);
   };
+
   return (
     <div className="login-page">
       <div className="fixed top-3 right-4 z-50">
         <ThemeButton />
       </div>
+
+      {/* Left image section */}
       <div className="left-image-section">
-        {/* Image with Login / Signup Switch Button */}
         <img
           src={imagePath[randomIdx]}
           alt="Fashion Model"
           className="login-image"
         />
         <div className="links-switch">
-          <Link to="/login" className="switch-links active">
+          <Link to="/login" className="switch-links">
             <button className="switch-button">Login</button>
           </Link>
         </div>
         <div className="links-switch-bottom">
-          <Link to="/signup" className="switch-links">
+          <Link to="/signup" className="switch-links active">
             <button className="switch-button">Sign Up</button>
           </Link>
         </div>
       </div>
+
+      {/* Right form section */}
       <div className="right-form-section">
-        {/* Mobile-only Login / Sign Up tab switcher */}
+        {/* Mobile-only tab switcher */}
         <div className="mobile-auth-tabs">
-          <Link to="/login" className="auth-tab active">
+          <Link to="/login" className="auth-tab">
             Login
           </Link>
-          <Link to="/signup" className="auth-tab">
+          <Link to="/signup" className="auth-tab active">
             Sign Up
           </Link>
         </div>
 
-        {/* Login Form */}
         <div className="form-container">
-          {/* Logo */}
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 py-4 sm:py-7">
             StyleO
           </h2>
           <form onSubmit={SubmitForm} className="login-form">
-            <h2 className="form-title">Login to Your Account</h2>
+            <h2 className="form-title">Create an Account</h2>
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              className="form-input"
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
             <input
               type="email"
               name="email"
@@ -83,19 +101,22 @@ const Login: React.FC = () => {
               className="form-input"
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              className="form-input"
+              onChange={(e) =>
+                setForm({ ...form, confirmPassword: e.target.value })
+              }
+            />
 
-            <div className="form-options">
-              <label className="remember-me">
-                <input type="checkbox" className="checkbox" />
-                <span>Remember me</span>
-              </label>
-              <a href="/forgot-password" className="forgot-password">
-                Forgot Password?
-              </a>
-            </div>
+            {error && (
+              <p className="text-sm text-red-500 text-center -mt-2">{error}</p>
+            )}
 
             <button type="submit" className="submit-button">
-              Login
+              Create Account
             </button>
 
             <div className="divider">
@@ -136,7 +157,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="signup-link">
-              Don't have an account? <Link to="/signup">Sign up</Link>
+              Already have an account? <Link to="/login">Log in</Link>
             </div>
           </form>
         </div>
@@ -145,4 +166,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Signup;

@@ -1,13 +1,260 @@
 @reference "tailwindcss";
 
+/* ─── Nav Shell ──────────────────────────────────────────────── */
 nav {
-  @apply w-screen h-16 bg-gray-800 dark:bg-white flex flex-row items-center p-5;
+  @apply fixed top-0 left-0 w-full z-40 flex items-center justify-between
+         px-5 md:px-10 h-16 md:h-20 transition-[background,box-shadow] duration-300;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-ul {
-  @apply flex flex-row items-center;
+.dark nav {
+  background: rgba(10, 10, 10, 0.52);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
-li {
-  @apply mx-4 text-gray-200 dark:text-gray-800;
+/* ─── Mobile-only centred Brand Logo ────────────────────────── */
+.nav-mobile-brand {
+  @apply flex md:hidden items-center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.nav-mobile-brand-name {
+  @apply font-extrabold tracking-tight ml-2 text-base;
+  color: #1b1b1b;
+}
+
+.dark .nav-mobile-brand-name {
+  color: #f5f5f5;
+}
+
+/* ─── Brand Logo ─────────────────────────────────────────────── */
+.nav-brand {
+  @apply hidden md:flex shrink-0;
+}
+
+.brand-link {
+  @apply flex items-center no-underline;
+}
+
+.nav-logo {
+  @apply w-12 h-12 object-contain;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-logo:hover {
+  transform: scale(1.12) rotate(-4deg);
+}
+
+/* ─── Desktop Nav Links ───────────────────────────────────────── */
+.nav-links {
+  @apply hidden md:flex gap-0.5 list-none items-center m-0 px-1 py-1;
+  position: relative;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 9999px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .nav-links {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Bubble Slider */
+/* higher specificity (0,2,1) beats .nav-links li (0,1,1) — ensures position:absolute wins */
+.nav-links li.nav-slider {
+  position: absolute;
+  top: 4px;
+  height: calc(100% - 8px);
+  background: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition:
+    left 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dark .nav-links li.nav-slider {
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nav-links li {
+  @apply list-none;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-links li a {
+  @apply px-4 py-2 rounded-full text-sm font-medium no-underline tracking-wide
+         transition-colors duration-200;
+  color: rgba(50, 50, 50, 0.9);
+}
+
+.dark .nav-links li a {
+  color: rgba(225, 225, 225, 0.85);
+}
+
+.nav-links li a.active {
+  @apply font-bold;
+  color: #1b1b1b;
+  /* no background here — the .nav-slider bubble provides the active highlight */
+}
+
+.dark .nav-links li a.active {
+  color: #ffffff;
+}
+
+.nav-links li a:hover {
+  color: #a855f7;
+}
+
+.dark .nav-links li a:hover {
+  color: #c084fc;
+}
+
+/* ─── Center Search Bar ───────────────────────────────────────── */
+.nav-search {
+  @apply hidden md:flex items-center gap-2.5 flex-1 max-w-xs mx-6 h-10 rounded-full px-4;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition:
+    box-shadow 0.2s,
+    background 0.2s;
+}
+
+.nav-search:focus-within {
+  box-shadow:
+    0 0 0 2px rgba(168, 85, 247, 0.25),
+    0 4px 14px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dark .nav-search {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dark .nav-search:focus-within {
+  background: rgba(255, 255, 255, 0.11);
+  box-shadow:
+    0 0 0 2px rgba(168, 85, 247, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.search-icon {
+  @apply shrink-0 text-gray-400;
+}
+
+.search-input {
+  @apply flex-1 bg-transparent border-none outline-none text-sm min-w-0;
+  color: #1b1b1b;
+  caret-color: #a855f7;
+}
+
+.dark .search-input {
+  color: #f3f4f6;
+}
+
+.search-input::placeholder {
+  @apply text-gray-400 text-xs;
+}
+
+/* ─── Theme Button Container ──────────────────────────────────── */
+.nav-theme-btn {
+  @apply shrink-0;
+}
+
+/* ─── Hamburger (mobile - leftmost) ──────────────────────────── */
+.hamburger {
+  @apply md:hidden flex items-center justify-center w-10 h-10 rounded-full
+         transition-colors duration-200 cursor-pointer border-0 outline-none;
+  background: rgba(255, 255, 255, 0.22);
+  color: #1b1b1b;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hamburger {
+  background: rgba(255, 255, 255, 0.09);
+  color: #f0f0f0;
+}
+
+.hamburger:hover {
+  background: rgba(168, 85, 247, 0.2);
+}
+
+/* ─── Mobile Dropdown Menu ───────────────────────────────────── */
+.mobile-menu {
+  @apply fixed left-0 right-0 z-39 flex flex-col gap-1
+         px-5 pt-3 pb-6;
+  top: 64px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.13);
+}
+
+.dark .mobile-menu {
+  background: rgba(11, 11, 22, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Mobile nav links */
+.mobile-nav-link {
+  @apply block w-full px-4 py-3 rounded-xl text-base font-medium no-underline
+         transition-[background,color] duration-150;
+  color: rgba(40, 40, 40, 0.9);
+}
+
+.dark .mobile-nav-link {
+  color: rgba(220, 220, 220, 0.88);
+}
+
+.mobile-nav-link:hover {
+  background: rgba(168, 85, 247, 0.09);
+  color: #9333ea;
+}
+
+.dark .mobile-nav-link:hover {
+  background: rgba(168, 85, 247, 0.16);
+  color: #c084fc;
+}
+
+.mobile-nav-link.active {
+  background: rgba(168, 85, 247, 0.13);
+  color: #7e22ce;
+  @apply font-bold;
+}
+
+.dark .mobile-nav-link.active {
+  background: rgba(168, 85, 247, 0.22);
+  color: #e9d5ff;
+}
+
+/* ─── Mobile Backdrop ────────────────────────────────────────── */
+.mobile-menu-backdrop {
+  @apply fixed inset-0 z-38;
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(2px);
 }
