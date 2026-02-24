@@ -3,6 +3,7 @@ import "../styles/NavBar.css";
 import ThemeButton from "./ThemeButton";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "./Logo";
 
 const navItems = [
   { path: "/", label: "Home" },
@@ -113,19 +114,14 @@ const NavBar = () => {
             className="brand-link"
             onClick={() => setMenuOpen(false)}
           >
-            <img src="/favicon_StyleO.png" alt="StyleO" className="nav-logo" />
-            <span className="nav-mobile-brand-name">StyleO</span>
+            <Logo className="nav-logo" />
           </Link>
         </div>
 
         {/* Brand Logo - hidden on mobile, visible on desktop */}
         <div className="nav-brand">
           <Link to="/" className="brand-link">
-            <img
-              src="/favicon_StyleO.png"
-              alt="StyleO Logo"
-              className="nav-logo"
-            />
+            <Logo className="nav-logo" />
           </Link>
         </div>
 
@@ -135,10 +131,12 @@ const NavBar = () => {
           <li
             aria-hidden="true"
             className="nav-slider"
-            style={{
-              left: `${sliderStyle.left}px`,
-              width: `${sliderStyle.width}px`,
-            }}
+            style={
+              {
+                "--slider-left": `${sliderStyle.left}px`,
+                "--slider-width": `${sliderStyle.width}px`,
+              } as React.CSSProperties
+            }
           />
           {navItems.map((item) => (
             <motion.li

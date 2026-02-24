@@ -6,6 +6,7 @@ import F2 from "../assets/F2.jpg";
 import M1 from "../assets/M1.jpg";
 import M2 from "../assets/M2.jpg";
 import ThemeButton from "../components/ThemeButton";
+import Logo from "../components/Logo";
 
 interface SignupForm {
   name?: string;
@@ -74,9 +75,7 @@ const Signup: React.FC = () => {
         </div>
 
         <div className="form-container">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 py-4 sm:py-7">
-            StyleO
-          </h2>
+          <Logo className="login-logo" />
           <form onSubmit={SubmitForm} className="login-form">
             <h2 className="form-title">Create an Account</h2>
 

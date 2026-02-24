@@ -1,25 +1,205 @@
 @import "tailwindcss";
 
-html {
-  interpolate-size: allow-keywords;
-  color-scheme: dark;
-  text-rendering: optimizeLegibility;
+/* ─── Design Tokens · Light (default) ─────────────────────── */
+:root {
+  /* Surface & background */
+  --bg: #f5f2eb;
+  --bg-elevated: #ffffff;
+  --surface-1: rgba(0, 0, 0, 0.03);
+  --surface-2: rgba(0, 0, 0, 0.055);
+  --surface-3: rgba(0, 0, 0, 0.08);
+  --card-bg: rgba(0, 0, 0, 0.025);
+  --card-inner: rgba(225, 222, 215, 0.65);
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-hi: rgba(0, 0, 0, 0.14);
+
+  /* Text */
+  --text-primary: #1a1c1e;
+  --text-dim: rgba(26, 28, 30, 0.72);
+  /* Accent – forest green (WCAG AA on light bg) */
+  --accent: #2d7a0f;
+  --accent-text: #ffffff;
+  --accent-glow: rgba(45, 122, 15, 0.2);
+  --accent-dim: rgba(45, 122, 15, 0.08);
+  --accent-surface: rgba(45, 122, 15, 0.05);
+  --accent-border: rgba(45, 122, 15, 0.18);
+  --accent-badge-bg: rgba(45, 122, 15, 0.08);
+  --accent-badge-border: rgba(45, 122, 15, 0.18);
+
+  /* Warning – warm amber */
+  --warn: #b87d20;
+  --warn-glow: rgba(184, 125, 32, 0.2);
+  --warn-badge-bg: rgba(184, 125, 32, 0.08);
+  --warn-badge-border: rgba(184, 125, 32, 0.18);
+
+  /* Danger */
+  --danger-text: rgba(200, 50, 50, 0.72);
+  --danger-bg: rgba(200, 50, 50, 0.05);
+  --danger-border: rgba(200, 50, 50, 0.12);
+
+  /* Neutral */
+  --muted: #8a8d95;
+  --muted-glow: rgba(138, 141, 149, 0.12);
+
+  /* Effects */
+  --hero-glow-color: rgba(45, 122, 15, 0.06);
+  --dot-grid-color: rgba(0, 0, 0, 0.06);
+  --shadow-heavy: rgba(0, 0, 0, 0.12);
+  --overlay-bg: rgba(245, 242, 235, 0.5);
+  --noise-opacity: 0.2;
+  --scrollbar-thumb: #c4c4c4;
+
+  /* Compatibility icons */
+  --check-bg: #2d7a0f;
+  --check-color: #ffffff;
+
+  /* Typography */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+
+  /* Jacket SVG Colors (Light Mode) */
+  --jacket-body-1: #e9e7df;
+  --jacket-body-2: #f2f0e9;
+  --jacket-body-3: #dfddda;
+  --jacket-lapel-1: #f5f2eb;
+  --jacket-lapel-2: #e3e1db;
+  --jacket-shoulder-1: #f8f6f0;
+  --jacket-shoulder-2: #e9e7df;
+  --jacket-lining-1: #7d6565;
+  --jacket-lining-2: #5c4747;
+  --jacket-shadow: #d1cfc7;
+  --jacket-collar: #ededeb;
+  --jacket-panel: #d8d6d0;
+  --jacket-btn: #333333;
+  --jacket-stitch: rgba(0, 0, 0, 0.06);
 }
 
-* {
+/* ─── Dark Mode Overrides ─────────────────────────────────── */
+.dark {
+  --bg: #07080a;
+  --bg-elevated: #0e1014;
+  --surface-1: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --surface-3: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(255, 255, 255, 0.035);
+  --card-inner: rgba(28, 30, 37, 0.7);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-hi: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #ede9df;
+  --text-dim: rgba(237, 233, 223, 0.45);
+
+  --accent: #a2f567;
+  --accent-text: #07080a;
+  --accent-glow: rgba(162, 245, 103, 0.35);
+  --accent-dim: rgba(162, 245, 103, 0.1);
+  --accent-surface: rgba(162, 245, 103, 0.05);
+  --accent-border: rgba(162, 245, 103, 0.18);
+  --accent-badge-bg: rgba(162, 245, 103, 0.1);
+  --accent-badge-border: rgba(162, 245, 103, 0.2);
+
+  --warn: #f5b967;
+  --warn-glow: rgba(245, 185, 103, 0.35);
+  --warn-badge-bg: rgba(245, 185, 103, 0.1);
+  --warn-badge-border: rgba(245, 185, 103, 0.2);
+
+  --danger-text: rgba(255, 100, 100, 0.65);
+  --danger-bg: rgba(255, 70, 70, 0.05);
+  --danger-border: rgba(255, 70, 70, 0.1);
+
+  --muted: #4a4d55;
+  --muted-glow: rgba(82, 85, 94, 0.2);
+
+  --hero-glow-color: rgba(162, 245, 103, 0.07);
+  --dot-grid-color: rgba(255, 255, 255, 0.07);
+  --shadow-heavy: rgba(0, 0, 0, 0.7);
+  --overlay-bg: rgba(7, 8, 10, 0.45);
+  --noise-opacity: 0.6;
+  --scrollbar-thumb: #4a4d55;
+
+  --check-bg: #a2f567;
+  --check-color: #07080a;
+
+  /* Jacket SVG Colors (Dark Mode) */
+  --jacket-body-1: #1c1e25;
+  --jacket-body-2: #20222a;
+  --jacket-body-3: #17191f;
+  --jacket-lapel-1: #292c36;
+  --jacket-lapel-2: #1e2028;
+  --jacket-shoulder-1: #2c2e38;
+  --jacket-shoulder-2: #1c1e25;
+  --jacket-lining-1: #2b1818;
+  --jacket-lining-2: #190e0e;
+  --jacket-shadow: #17191f;
+  --jacket-collar: #202330;
+  --jacket-panel: #191b22;
+  --jacket-btn: #141619;
+  --jacket-stitch: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Reset & Base ────────────────────────────────────────── */
+html {
+  interpolate-size: allow-keywords;
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: "Arial", sans-serif;
-  text-rendering: optimizeLegibility;
-  background-color: aliceblue;
-  color: #1b1b1b;
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
-body.dark {
-  background-color: #1b1b1b;
-  color: #f2f2f2;
+/* ─── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
+
+/* ─── Selection ───────────────────────────────────────────── */
+::selection {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ─── Noise overlay (global atmosphere) ──────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+  opacity: var(--noise-opacity);
 }

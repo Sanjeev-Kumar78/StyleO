@@ -30,15 +30,6 @@ nav {
   pointer-events: auto;
 }
 
-.nav-mobile-brand-name {
-  @apply font-extrabold tracking-tight ml-2 text-base;
-  color: #1b1b1b;
-}
-
-.dark .nav-mobile-brand-name {
-  color: #f5f5f5;
-}
-
 /* ─── Brand Logo ─────────────────────────────────────────────── */
 .nav-brand {
   @apply hidden md:flex shrink-0;
@@ -49,12 +40,12 @@ nav {
 }
 
 .nav-logo {
-  @apply w-12 h-12 object-contain;
+  @apply text-2xl md:text-3xl;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-logo:hover {
-  transform: scale(1.12) rotate(-4deg);
+  transform: scale(1.08) rotate(-3deg);
 }
 
 /* ─── Desktop Nav Links ───────────────────────────────────────── */
@@ -77,7 +68,9 @@ nav {
   position: absolute;
   top: 4px;
   height: calc(100% - 8px);
-  background: white;
+  left: var(--slider-left, 0px);
+  width: var(--slider-width, 0px);
+  background: var(--surface-2);
   border-radius: 9999px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition:
@@ -108,22 +101,14 @@ nav {
   color: rgba(225, 225, 225, 0.85);
 }
 
-.nav-links li a.active {
-  @apply font-bold;
-  color: #1b1b1b;
-  /* no background here — the .nav-slider bubble provides the active highlight */
-}
-
+.nav-links li a.active,
 .dark .nav-links li a.active {
-  color: #ffffff;
+  @apply font-bold;
+  color: var(--text-primary);
 }
 
 .nav-links li a:hover {
-  color: #a855f7;
-}
-
-.dark .nav-links li a:hover {
-  color: #c084fc;
+  color: var(--accent);
 }
 
 /* ─── Center Search Bar ───────────────────────────────────────── */
@@ -142,7 +127,7 @@ nav {
 
 .nav-search:focus-within {
   box-shadow:
-    0 0 0 2px rgba(168, 85, 247, 0.25),
+    0 0 0 2px var(--accent-dim),
     0 4px 14px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.72);
 }
@@ -156,7 +141,7 @@ nav {
 .dark .nav-search:focus-within {
   background: rgba(255, 255, 255, 0.11);
   box-shadow:
-    0 0 0 2px rgba(168, 85, 247, 0.35),
+    0 0 0 2px var(--accent-dim),
     0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
@@ -166,12 +151,8 @@ nav {
 
 .search-input {
   @apply flex-1 bg-transparent border-none outline-none text-sm min-w-0;
-  color: #1b1b1b;
-  caret-color: #a855f7;
-}
-
-.dark .search-input {
-  color: #f3f4f6;
+  color: var(--text-primary);
+  caret-color: var(--accent);
 }
 
 .search-input::placeholder {
@@ -199,7 +180,7 @@ nav {
 }
 
 .hamburger:hover {
-  background: rgba(168, 85, 247, 0.2);
+  background: var(--accent-dim);
 }
 
 /* ─── Mobile Dropdown Menu ───────────────────────────────────── */
@@ -231,25 +212,17 @@ nav {
   color: rgba(220, 220, 220, 0.88);
 }
 
-.mobile-nav-link:hover {
-  background: rgba(168, 85, 247, 0.09);
-  color: #9333ea;
-}
-
+.mobile-nav-link:hover,
 .dark .mobile-nav-link:hover {
-  background: rgba(168, 85, 247, 0.16);
-  color: #c084fc;
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
-.mobile-nav-link.active {
-  background: rgba(168, 85, 247, 0.13);
-  color: #7e22ce;
-  @apply font-bold;
-}
-
+.mobile-nav-link.active,
 .dark .mobile-nav-link.active {
-  background: rgba(168, 85, 247, 0.22);
-  color: #e9d5ff;
+  @apply font-bold;
+  background: var(--accent-badge-bg);
+  color: var(--accent);
 }
 
 /* ─── Mobile Backdrop ────────────────────────────────────────── */

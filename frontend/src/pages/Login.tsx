@@ -6,6 +6,8 @@ import F2 from "../assets/F2.jpg";
 import M1 from "../assets/M1.jpg";
 import M2 from "../assets/M2.jpg";
 import ThemeButton from "../components/ThemeButton";
+import Logo from "../components/Logo";
+
 interface form {
   email?: string;
   password?: string;
@@ -61,12 +63,9 @@ const Login: React.FC = () => {
           </Link>
         </div>
 
-        {/* Login Form */}
         <div className="form-container">
           {/* Logo */}
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 py-4 sm:py-7">
-            StyleO
-          </h2>
+          <Logo className="login-logo" />
           <form onSubmit={SubmitForm} className="login-form">
             <h2 className="form-title">Login to Your Account</h2>
             <input
@@ -136,7 +135,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="signup-link">
-              Don't have an account? <Link to="/signup">Sign up</Link>
+              Don&apos;t have an account? <Link to="/signup">Sign up</Link>
             </div>
           </form>
         </div>
