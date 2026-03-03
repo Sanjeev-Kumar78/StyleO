@@ -10,7 +10,7 @@ import {
 import NavBar from "../components/NavBar";
 import "../styles/Home.css";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  Types 
 interface MousePos {
   x: number;
   y: number;
@@ -25,7 +25,7 @@ interface OutfitItem {
   imgSrc?: string; // drop your image paths here
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+//  Data 
 const GARMENT_STATES = [
   {
     id: 0,
@@ -78,7 +78,7 @@ const OUTFIT_ITEMS: OutfitItem[] = [
   { id: "shorts",   name: "Linen Shorts",      tag: "Bottom",    emoji: "🩳", compatible: false },
 ];
 
-// ─── Jacket SVG ───────────────────────────────────────────────────────────────
+//  Jacket SVG 
 const JacketVisual = ({
   mouseX,
   mouseY,
@@ -159,62 +159,62 @@ const JacketVisual = ({
             </filter>
           </defs>
 
-          {/* ── Inner Lining / Shirt Area ── */}
+          {/*  Inner Lining / Shirt Area  */}
           <path d="M80 20 L160 20 L160 190 L120 220 L80 190 Z" fill="url(#innerLining)" />
           
-          {/* ── Shirt Collar ── */}
+          {/*  Shirt Collar  */}
           <path d="M80 20 L120 60 L160 20 L160 26 L120 66 L80 26 Z" fill="#E2E8F0" />
           
-          {/* ── Necktie ── */}
+          {/*  Necktie  */}
           <path d="M115 62 L125 62 L130 160 L120 175 L110 160 Z" fill="#0F172A" />
           <path d="M114 80 L126 70 M113 110 L127 100 M111 140 L129 130" stroke="#1E293B" strokeWidth="2" fill="none" opacity="0.6" />
 
-          {/* ── Jacket Back Collar ── */}
+          {/*  Jacket Back Collar  */}
           <path d="M65 14 C80 2 160 2 175 14 L160 22 C140 12 100 12 80 22 Z" fill="#12131A" />
 
-          {/* ── Left Body Main Plate ── */}
+          {/*  Left Body Main Plate  */}
           <path 
             d="M120 310 L25 310 C15 310 5 280 8 160 C11 100 20 45 40 35 C60 25 80 25 80 25 L120 190 Z" 
             fill="url(#bodyGradLeft)" 
           />
           
-          {/* ── Right Body Main Plate ── */}
+          {/*  Right Body Main Plate  */}
           <path 
             d="M120 310 L215 310 C225 310 235 280 232 160 C229 100 220 45 200 35 C180 25 160 25 160 25 L120 190 Z" 
             fill="url(#bodyGradRight)" 
           />
 
-          {/* ── Left Lapel (Peaked) ── */}
+          {/*  Left Lapel (Peaked)  */}
           <path 
             d="M80 25 C70 50 45 105 35 140 L65 130 L75 155 C90 190 110 215 120 225 L120 190 C110 165 95 95 80 25 Z" 
             fill="url(#lapelGrad)" 
             filter="url(#lapelShadowL)"
           />
           
-          {/* ── Right Lapel (Peaked) ── */}
+          {/*  Right Lapel (Peaked)  */}
           <path 
             d="M160 25 C170 50 195 105 205 140 L175 130 L165 155 C150 190 130 215 120 225 L120 190 C130 165 145 95 160 25 Z" 
             fill="url(#lapelGrad)" 
             filter="url(#lapelShadowR)"
           />
 
-          {/* ── Lapel Notches (Inner shadows) ── */}
+          {/*  Lapel Notches (Inner shadows)  */}
           <path d="M35 140 L65 130 L45 105 Z" fill="#151724" opacity="0.85" />
           <path d="M205 140 L175 130 L195 105 Z" fill="#151724" opacity="0.85" />
 
-          {/* ── Left Breast Pocket ── */}
+          {/*  Left Breast Pocket  */}
           <path d="M42 110 L78 100 L80 104 L44 114 Z" fill="#181A24" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
           
-          {/* ── Gold Pocket Square ── */}
+          {/*  Gold Pocket Square  */}
           <path d="M48 105 L55 85 L65 100 L72 88 L76 99" fill="url(#goldPocketSquare)" filter="url(#softShadow)" />
 
-          {/* ── Side Pockets (Flapped) ── */}
+          {/*  Side Pockets (Flapped)  */}
           {/* Left Pocket Flap */}
           <path d="M28 230 L75 220 L77 225 L30 235 Z" fill="#1B1D28" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" filter="url(#softShadow)" />
           {/* Right Pocket Flap */}
           <path d="M212 230 L165 220 L163 225 L210 235 Z" fill="#1B1D28" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" filter="url(#softShadow)" />
 
-          {/* ── Center Seam & Stitching Details ── */}
+          {/*  Center Seam & Stitching Details  */}
           <line x1="120" y1="225" x2="120" y2="310" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
           
           {/* Pocket Stitching */}
@@ -226,7 +226,7 @@ const JacketVisual = ({
           <path d="M40 35 C25 65 20 105 18 160" stroke="#0B0C12" strokeWidth="4" filter="blur(2px)" fill="none" opacity="0.6" />
           <path d="M200 35 C215 65 220 105 222 160" stroke="#0B0C12" strokeWidth="4" filter="blur(2px)" fill="none" opacity="0.6" />
 
-          {/* ── Dynamic Glowing Buttons ── */}
+          {/*  Dynamic Glowing Buttons  */}
           {[230, 260, 290].map((y, i) => (
             <g key={i}>
               <circle cx="120" cy={y} r="6" fill="#0C0D12" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
@@ -242,7 +242,7 @@ const JacketVisual = ({
             </g>
           ))}
 
-          {/* ── Accent Edge Gleams ── */}
+          {/*  Accent Edge Gleams  */}
           {/* Subtle tech-green glow tracing the left bottom hem */}
           <path 
             d="M25 310 L120 310" 
@@ -275,7 +275,7 @@ const JacketVisual = ({
   );
 };
 
-// ─── Garment State Card ───────────────────────────────────────────────────────
+//  Garment State Card ─
 const StateCard = ({
   state,
 }: {
@@ -371,7 +371,7 @@ const StateCard = ({
   );
 };
 
-// ─── Outfit Item Card ─────────────────────────────────────────────────────────
+//  Outfit Item Card 
 const OutfitItemCard = ({
   item,
   delay,
@@ -418,10 +418,10 @@ const OutfitItemCard = ({
   </motion.div>
 );
 
-// ─── HomePage ─────────────────────────────────────────────────────────────────
+//  HomePage 
 const HomePage: React.FC = () => {
 
-  /* ── Mouse parallax (hero jacket tilt) ── */
+  /*  Mouse parallax (hero jacket tilt)  */
   const [mouse, setMouse] = useState<MousePos>({ x: 0.5, y: 0.5 });
   const [smooth, setSmooth] = useState<MousePos>({ x: 0.5, y: 0.5 });
   const rafRef = useRef<number>(0);
@@ -443,7 +443,7 @@ const HomePage: React.FC = () => {
     return () => cancelAnimationFrame(rafRef.current);
   }, [mouse]);
 
-  /* ── Page-level scroll for parallax ── */
+  /*  Page-level scroll for parallax  */
   const { scrollY } = useScroll();
 
   // Hero: jacket drifts up at 30% of scroll speed (parallax)
@@ -461,7 +461,7 @@ const HomePage: React.FC = () => {
   // Section fade-in opacity via spring (hero fade as user scrolls past)
   const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
 
-  /* ── Lifecycle auto-play state ── */
+  /*  Lifecycle auto-play state  */
   const [activeState, setActiveState] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -473,7 +473,7 @@ const HomePage: React.FC = () => {
     return () => clearInterval(timer);
   }, [paused]);
 
-  /* ── Context section inView ── */
+  /*  Context section inView  */
   const contextRef    = useRef<HTMLDivElement>(null);
   const contextInView = useInView(contextRef, { once: false, margin: "-15%" });
   const [outfitVisible, setOutfitVisible] = useState(false);
@@ -491,7 +491,7 @@ const HomePage: React.FC = () => {
   const compatibleItems   = OUTFIT_ITEMS.filter((i) => i.compatible);
   const incompatibleItems = OUTFIT_ITEMS.filter((i) => !i.compatible);
 
-  // ─────────────────────────────────────────────────────────── render
+  //  render
   return (
     <div className="hp-root">
       <NavBar />
@@ -649,7 +649,7 @@ const HomePage: React.FC = () => {
       <section className="hp-lifecycle-section">
         <div className="hp-lifecycle-grid">
 
-          {/* ── Left column: heading + pills ── */}
+          {/*  Left column: heading + pills  */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -707,7 +707,7 @@ const HomePage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* ── Right column: animated state card ── */}
+          {/*  Right column: animated state card  */}
           <div>
             <AnimatePresence mode="wait">
               <motion.div

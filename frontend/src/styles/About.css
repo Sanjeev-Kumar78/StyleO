@@ -1,0 +1,377 @@
+@reference "tailwindcss";
+
+/* Page root */
+.ab-root {
+  @apply min-h-screen overflow-x-hidden;
+  background: var(--bg);
+  transition: background-color 0.35s ease;
+}
+
+/* Hero section */
+.ab-hero {
+  @apply relative text-center overflow-hidden;
+  padding: clamp(7rem, 12vw, 10rem) clamp(1.25rem, 5vw, 3.5rem) clamp(4rem, 8vw, 6rem);
+}
+
+.ab-hero-glow {
+  @apply absolute pointer-events-none;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(400px, 60vw, 800px);
+  height: clamp(300px, 40vw, 500px);
+  background: radial-gradient(ellipse, var(--hero-glow-color) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+.ab-hero-dot-grid {
+  @apply absolute inset-0 pointer-events-none;
+  background-image: radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%);
+}
+
+.ab-hero-inner {
+  @apply relative z-10 mx-auto;
+  max-width: 52rem;
+}
+
+.ab-eyebrow {
+  @apply flex items-center justify-center gap-3 mb-6;
+}
+
+.ab-eyebrow-line {
+  @apply shrink-0;
+  height: 1px;
+  width: 32px;
+  background: var(--accent);
+}
+
+.ab-eyebrow-text {
+  @apply uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  font-family: var(--font-body);
+}
+
+.ab-hero-h1 {
+  @apply mb-6;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.ab-hero-h1 em {
+  @apply italic;
+  color: var(--accent);
+}
+
+.ab-hero-body {
+  @apply mx-auto text-justify;
+  color: var(--text-dim);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  font-weight: 300;
+  line-height: 1.8;
+  max-width: 38rem;
+}
+
+/* Shared section wrapper */
+.ab-section {
+  @apply relative;
+  padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ab-section-inner {
+  @apply mx-auto;
+  max-width: 74rem;
+}
+
+/* Section headings */
+.ab-section-eyebrow {
+  @apply flex items-center gap-3 mb-4;
+}
+
+.ab-section-h2 {
+  @apply mb-4;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.ab-section-h2 em {
+  @apply italic;
+  color: var(--accent);
+}
+
+.ab-section-sub {
+  @apply text-justify;
+  color: var(--text-dim);
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 38rem;
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+/* Comparison cards */
+.ab-compare-grid {
+  @apply grid grid-cols-1 gap-4;
+}
+
+.ab-compare-card {
+  @apply grid grid-cols-2 overflow-hidden rounded-2xl;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.ab-compare-card:hover {
+  box-shadow: 0 8px 32px var(--shadow-heavy);
+  transform: translateY(-2px);
+}
+
+.ab-compare-side {
+  @apply flex flex-col gap-2;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.ab-compare-side--styleo {
+  background: var(--accent-surface);
+  border-left: 3px solid var(--accent);
+}
+
+.ab-compare-label {
+  @apply uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  font-family: var(--font-body);
+  color: var(--text-dim);
+  margin-bottom: 0.25rem;
+}
+
+.ab-compare-label--accent {
+  color: var(--accent);
+}
+
+.ab-compare-feature {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.ab-compare-desc {
+  @apply text-justify;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.ab-compare-badge {
+  @apply inline-flex items-center gap-1 rounded-full w-fit;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+}
+
+.ab-compare-badge--muted {
+  background: var(--surface-1);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.ab-compare-badge--accent {
+  background: var(--accent-badge-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-badge-border);
+}
+
+@media (max-width: 600px) {
+  .ab-compare-card {
+    @apply grid-cols-1;
+  }
+  .ab-compare-side--styleo {
+    border-left: none;
+    border-top: 3px solid var(--accent);
+  }
+}
+
+/* Benefits grid */
+.ab-benefits-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.ab-benefit-card {
+  @apply rounded-2xl;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+
+.ab-benefit-card:hover {
+  box-shadow: 0 8px 32px var(--shadow-heavy);
+  transform: translateY(-3px);
+  border-color: var(--accent-border);
+}
+
+.ab-benefit-icon {
+  @apply flex items-center justify-center shrink-0 mb-4 rounded-xl;
+  width: 44px;
+  height: 44px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+}
+
+.ab-benefit-title {
+  @apply mb-1;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.ab-benefit-desc {
+  @apply text-justify;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+/* Constraints section */
+.ab-constraints-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
+.ab-constraint-card {
+  @apply flex items-start gap-4 rounded-2xl;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  transition: box-shadow 0.25s ease;
+}
+
+.ab-constraint-card:hover {
+  box-shadow: 0 8px 24px var(--shadow-heavy);
+}
+
+.ab-constraint-num {
+  @apply flex items-center justify-center shrink-0 rounded-full font-semibold;
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.ab-constraint-title {
+  @apply font-medium mb-1;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.ab-constraint-desc {
+  @apply text-justify;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* Difficulty chip */
+.ab-difficulty {
+  @apply inline-flex items-center gap-1 uppercase rounded-full mt-2;
+  font-size: 0.6rem;
+  font-family: var(--font-body);
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.5rem;
+}
+
+.ab-difficulty--high {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
+}
+
+.ab-difficulty--medium {
+  background: var(--warn-badge-bg);
+  color: var(--warn);
+  border: 1px solid var(--warn-badge-border);
+}
+
+.ab-difficulty--low {
+  background: var(--surface-1);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+/* Footer CTA */
+.ab-footer {
+  @apply relative text-center overflow-hidden;
+  padding: clamp(5rem, 10vw, 8rem) clamp(1.25rem, 4vw, 3.5rem);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ab-footer-glow {
+  @apply absolute pointer-events-none;
+  bottom: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(400px, 50vw, 700px);
+  height: clamp(250px, 30vw, 400px);
+  background: radial-gradient(ellipse, var(--hero-glow-color) 0%, transparent 60%);
+  filter: blur(60px);
+}
+
+.ab-footer-eyebrow {
+  @apply uppercase mb-4;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  font-family: var(--font-body);
+}
+
+.ab-footer-h2 {
+  @apply mx-auto mb-8;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  color: var(--text-primary);
+  line-height: 1.15;
+  max-width: 32rem;
+}
+
+.ab-footer-h2 em {
+  @apply italic;
+  color: var(--accent);
+}
+
+.ab-footer-cta {
+  @apply inline-flex items-center justify-center rounded-full cursor-pointer border-none outline-none;
+  padding: 0.875rem 2.2rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 0 28px var(--accent-glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ab-footer-cta:focus-visible {
+  @apply outline-2 outline-offset-2;
+  outline-color: var(--accent);
+}

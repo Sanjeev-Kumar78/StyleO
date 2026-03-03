@@ -1,23 +1,14 @@
 @reference "tailwindcss";
 
-/* ─── Theme Toggle Button ──────────────────────────────────── */
+/* Theme Toggle Button */
 .theme-toggle {
+  @apply flex items-center justify-center p-0 rounded-full outline-none cursor-pointer;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface-1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  outline: none;
   color: var(--text-primary);
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.2s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
 }
 
 .theme-toggle:hover {
@@ -31,9 +22,7 @@
 }
 
 .theme-toggle__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply flex items-center justify-center;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 

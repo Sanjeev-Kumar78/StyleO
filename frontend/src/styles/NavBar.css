@@ -1,6 +1,6 @@
 @reference "tailwindcss";
 
-/* ─── Nav Shell ──────────────────────────────────────────────── */
+/*  Nav Shell  */
 nav {
   @apply fixed top-0 left-0 w-full z-40 flex items-center justify-between
          px-5 md:px-10 h-16 md:h-20 transition-[background,box-shadow] duration-300;
@@ -21,7 +21,7 @@ nav {
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
-/* ─── Mobile-only centred Brand Logo ────────────────────────── */
+/*  Mobile-only centred Brand Logo  */
 .nav-mobile-brand {
   @apply flex md:hidden items-center;
   position: absolute;
@@ -30,7 +30,7 @@ nav {
   pointer-events: auto;
 }
 
-/* ─── Brand Logo ─────────────────────────────────────────────── */
+/*  Brand Logo  */
 .nav-brand {
   @apply hidden md:flex shrink-0;
 }
@@ -48,7 +48,7 @@ nav {
   transform: scale(1.08) rotate(-3deg);
 }
 
-/* ─── Desktop Nav Links ───────────────────────────────────────── */
+/*  Desktop Nav Links  */
 .nav-links {
   @apply hidden md:flex gap-0.5 list-none items-center m-0 px-1 py-1;
   position: relative;
@@ -111,7 +111,7 @@ nav {
   color: var(--accent);
 }
 
-/* ─── Center Search Bar ───────────────────────────────────────── */
+/*  Center Search Bar  */
 .nav-search {
   @apply hidden md:flex items-center gap-2.5 flex-1 max-w-xs mx-6 h-10 rounded-full px-4;
   background: rgba(255, 255, 255, 0.5);
@@ -159,12 +159,12 @@ nav {
   @apply text-gray-400 text-xs;
 }
 
-/* ─── Theme Button Container ──────────────────────────────────── */
+/*  Theme Button Container  */
 .nav-theme-btn {
   @apply shrink-0;
 }
 
-/* ─── Hamburger (mobile - leftmost) ──────────────────────────── */
+/*  Hamburger (mobile - leftmost) ─ */
 .hamburger {
   @apply md:hidden flex items-center justify-center w-10 h-10 rounded-full
          transition-colors duration-200 cursor-pointer border-0 outline-none;
@@ -183,7 +183,7 @@ nav {
   background: var(--accent-dim);
 }
 
-/* ─── Mobile Dropdown Menu ───────────────────────────────────── */
+/*  Mobile Dropdown Menu ─ */
 .mobile-menu {
   @apply fixed left-0 right-0 z-39 flex flex-col gap-1
          px-5 pt-3 pb-6;
@@ -225,7 +225,7 @@ nav {
   color: var(--accent);
 }
 
-/* ─── Mobile Backdrop ────────────────────────────────────────── */
+/*  Mobile Backdrop  */
 .mobile-menu-backdrop {
   @apply fixed inset-0 z-38;
   background: rgba(0, 0, 0, 0.18);

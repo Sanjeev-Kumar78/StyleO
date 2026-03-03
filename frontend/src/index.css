@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens · Light (default) ─────────────────────── */
+/*  Design Tokens · Light (default)  */
 :root {
   /* Surface & background */
   --bg: #f5f2eb;
@@ -77,7 +77,7 @@
   --jacket-stitch: rgba(0, 0, 0, 0.06);
 }
 
-/* ─── Dark Mode Overrides ─────────────────────────────────── */
+/*  Dark Mode Overrides  */
 .dark {
   --bg: #07080a;
   --bg-elevated: #0e1014;
@@ -92,7 +92,8 @@
   --border-hi: rgba(255, 255, 255, 0.14);
 
   --text-primary: #ede9df;
-  --text-dim: rgba(237, 233, 223, 0.45);
+  /* --text-dim: rgba(237, 233, 223, 0.45);  */
+  --text-dim: rgba(237, 233, 223, 0.731);
 
   --accent: #a2f567;
   --accent-text: #07080a;
@@ -142,7 +143,7 @@
   --jacket-stitch: rgba(255, 255, 255, 0.06);
 }
 
-/* ─── Reset & Base ────────────────────────────────────────── */
+/*  Reset & Base  */
 html {
   interpolate-size: allow-keywords;
   color-scheme: light;
@@ -174,7 +175,7 @@ body {
     color 0.35s ease;
 }
 
-/* ─── Scrollbar ───────────────────────────────────────────── */
+/*  Scrollbar  */
 ::-webkit-scrollbar {
   width: 3px;
 }
@@ -186,13 +187,13 @@ body {
   border-radius: 2px;
 }
 
-/* ─── Selection ───────────────────────────────────────────── */
+/*  Selection  */
 ::selection {
   background: var(--accent-dim);
   color: var(--accent);
 }
 
-/* ─── Noise overlay (global atmosphere) ──────────────────── */
+/*  Noise overlay (global atmosphere)  */
 body::before {
   content: "";
   position: fixed;

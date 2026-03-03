@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@reference "tailwindcss";
 
-/* ─── Page Shell ─────────────────────────────────────────────── */
+/*  Page Shell  */
 .login-page {
   @apply flex h-screen w-screen overflow-hidden;
   /* Use the exact same background variable as HomePage */
@@ -8,7 +8,7 @@
   transition: background-color 0.35s ease;
 }
 
-/* ─── Left Image Section ─────────────────────────────────────── */
+/*  Left Image Section  */
 .left-image-section {
   @apply hidden md:flex w-1/2 relative bg-cover bg-center h-dvh;
 }
@@ -62,13 +62,13 @@
   transform: scale(1.05);
 }
 
-/* ─── Right Form Section ─────────────────────────────────────── */
+/*  Right Form Section  */
 .right-form-section {
   @apply w-full md:w-1/2 flex flex-col justify-center items-center h-full z-10
          gap-4 px-4 py-8 md:px-0 md:py-0;
 }
 
-/* ─── Mobile Login/Signup Tab Switcher ───────────────────────── */
+/*  Mobile Login/Signup Tab Switcher ─ */
 .mobile-auth-tabs {
   @apply flex md:hidden items-center gap-0 p-1 rounded-full;
   background: var(--surface-1);
@@ -94,7 +94,7 @@
   border: 1px solid var(--border-hi);
 }
 
-/* ─── Glass Form Container ───────────────────────────────────── */
+/*  Glass Form Container ─ */
 .right-form-section > .form-container {
   @apply w-full max-w-sm px-7 py-9 flex flex-col items-center rounded-3xl
          overflow-y-auto relative;
@@ -112,7 +112,7 @@
   @apply w-16 mb-6;
 }
 
-/* ─── Logo ───────────────────────────────────────────────────── */
+/*  Logo  */
 .login-logo {
   @apply text-3xl sm:text-4xl font-bold mb-8 flex items-center gap-3 tracking-tight;
   color: var(--text-primary);
@@ -124,7 +124,7 @@
   font-style: italic;
 }
 
-/* ─── Form ───────────────────────────────────────────────────── */
+/*  Form  */
 .login-form {
   @apply w-full flex flex-col gap-5 relative z-10;
 }
@@ -136,7 +136,7 @@
   color: var(--text-primary);
 }
 
-/* ─── Inputs ─────────────────────────────────────────────────── */
+/*  Inputs  */
 .login-form > .form-input {
   @apply w-full h-12 rounded-xl px-4 focus:outline-none transition-all duration-200 text-base;
   
@@ -159,7 +159,7 @@
   color: var(--muted);
 }
 
-/* ─── Submit Button ──────────────────────────────────────────── */
+/*  Submit Button  */
 .login-form > .submit-button {
   @apply w-full h-12 rounded-full mt-2 cursor-pointer transition-all duration-200;
   
@@ -192,7 +192,7 @@
   outline-offset: 3px;
 }
 
-/* ─── Form Options ───────────────────────────────────────────── */
+/*  Form Options  */
 .login-form > .form-options {
   @apply flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 -mt-1;
 }
@@ -223,7 +223,7 @@
   color: var(--text-primary);
 }
 
-/* ─── Divider ────────────────────────────────────────────────── */
+/*  Divider  */
 .login-form > .divider {
   @apply relative flex items-center justify-center my-1;
 }
@@ -241,7 +241,7 @@
   font-family: var(--font-body);
 }
 
-/* ─── Social Buttons ─────────────────────────────────────────── */
+/*  Social Buttons ─ */
 .login-form > .social-login {
   @apply flex flex-col sm:flex-row gap-3;
 }
@@ -274,7 +274,7 @@
   @apply w-5 h-5;
 }
 
-/* ─── Sign Up Link ───────────────────────────────────────────── */
+/*  Sign Up Link  */
 .login-form > .signup-link {
   @apply text-center text-sm mt-1;
   color: var(--text-dim);
