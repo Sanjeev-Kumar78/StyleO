@@ -13,10 +13,11 @@ import ContactPage from "./pages/ContactPage";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import { useAuth } from "./hooks/useAuth";
 
 function ProtectedRoute() {
-  const isAuthenticated = false; // Replace with actual authentication logic
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace={true} />;
+  const { user } = useAuth();
+  return user ? <Outlet /> : <Navigate to="/login" replace={true} />;
 }
 
 const App: React.FC = () => {

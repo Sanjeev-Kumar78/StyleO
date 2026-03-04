@@ -1,0 +1,205 @@
+from beanie import PydanticObjectId
+from core.security import (
+    create_access_token,
+    verify_access_token,
+    hash_password,
+    verify_password,
+)
+from core.config import settings
+from fastapi import APIRouter, Request, Response, HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from models.Model import User, UserCreate, UserResponse, Provider
+from pydantic import BaseModel
+
+
+class GoogleAuthRequest(BaseModel):
+    credential: str
+
+auth_router = APIRouter(prefix="/auth", tags=["auth"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+
+
+# Dependency
+async def get_current_user(
+    request: Request,
+    token: str | None = Depends(oauth2_scheme),
+) -> User:
+    """
+    FastAPI dependency – resolves the JWT to a User document.
+    Checks the `access_token` cookie first, then the Authorization header.
+    Raises HTTP 401 if no valid token is found.
+    """
+    credentials_exc = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    # Try cookie first, then Bearer header
+    jwt_token = request.cookies.get("access_token") or token
+    if not jwt_token:
+        # Try header
+        jwt_token = request.headers.get("access_token")
+        if not jwt_token:
+            raise credentials_exc
+    payload = verify_access_token(jwt_token)
+    user_id: str | None = payload.get("sub")
+    if not user_id:
+        raise credentials_exc
+    user = await User.get(PydanticObjectId(user_id))
+    if user is None or not user.is_active:
+        raise credentials_exc
+    return user
+
+
+@auth_router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(body: UserCreate):
+    """
+    Create a new user account.
+
+    - Rejects duplicate email or username (HTTP 409).
+    - Stores a bcrypt hash of the password – plain text is never persisted.
+    """
+    if await User.find_one(User.email == body.email):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail="Email already registered")
+    if await User.find_one(User.username == body.username):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail="Username already taken")
+
+    user = User(
+        username=body.username,
+        email=body.email,
+        hashed_password=hash_password(body.password),
+    )
+    await user.insert()
+    return user
+
+
+@auth_router.post("/login")
+async def login(
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
+    """
+    Authenticate with e-mail) + password
+
+    Returns a signed JWT as both:
+    - a JSON body  `{"access_token": "...", "token_type": "bearer"}` (for
+      API / mobile clients), and
+    - an `httponly` cookie (for browser clients).
+    """
+    user = await User.find_one(User.email == form_data.username)
+    if user is None or user.hashed_password is None or not verify_password(
+        form_data.password, user.hashed_password.get_secret_value()
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Account is disabled")
+
+    token = create_access_token(data={"sub": str(user.id)})
+
+    # Cookie delivery (browser clients)
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,   # set to True in production (HTTPS only)
+        samesite="lax",
+        max_age=60 * 60 * 24,
+    )
+    # Header delivery (API / mobile clients)
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@auth_router.post("/logout")
+async def logout(response: Response):
+    """Clear the auth cookie (browser logout)."""
+    response.delete_cookie(key="access_token")
+    return {"message": "Logged out successfully"}
+
+
+@auth_router.post("/google")
+async def google_auth(body: GoogleAuthRequest, response: Response):
+    """
+    Authenticate via Google Sign-In.
+
+    - Verifies the Google ID token.
+    - If the email already exists, merges with the existing account
+      (updates provider to 'google').
+    - If new email, creates a new user (no password, provider='google').
+    - Sets JWT cookie for session.
+    """
+    try:
+        payload = id_token.verify_oauth2_token(
+            body.credential,
+            google_requests.Request(),
+            settings.GOOGLE_CLIENT_ID,
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google token",
+        )
+
+    email = payload.get("email")
+    name = payload.get("name", "")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google account has no email",
+        )
+
+    # Check if user already exists with this email
+    user = await User.find_one(User.email == email)
+
+    if user:
+        # Merge: update provider to google if it was local-only
+        if user.provider == Provider.local:
+            user.provider = Provider.google
+            await user.save()
+    else:
+        # New user from Google — generate a unique username
+        import secrets
+        base_username = name.replace(" ", "_").lower() or "user"
+        username = base_username
+        # Ensure unique username
+        while await User.find_one(User.username == username):
+            username = f"{base_username}_{secrets.token_hex(3)}"
+
+        user = User(
+            username=username,
+            email=email,
+            provider=Provider.google,
+            hashed_password=None,
+        )
+        await user.insert()
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is disabled",
+        )
+
+    token = create_access_token(data={"sub": str(user.id)})
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=60 * 60 * 24,
+    )
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@auth_router.get("/me", response_model=UserResponse)
+async def me(user: User = Depends(get_current_user)):
+    """Return the currently authenticated user."""
+    return user
