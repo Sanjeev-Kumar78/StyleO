@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = Field(default="")
     REDIS_PASSWORD: str = Field(default="")
     REDIS_DB_URL: str = Field(default="redis://localhost:6379")
+    COOKIE_SECURE: bool = Field(default=True)
 
     model_config = {
         "env_file": ".env",

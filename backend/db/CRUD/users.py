@@ -50,10 +50,13 @@ async def update_user_profile(user_email: str, profile_data: dict) -> Profile:
     user = await get_user_by_email(user_email)
     if not user:
         raise ValueError("User not found")
-    if not user.profile:
-        user.profile = Profile(**profile_data)
+    # Profile is a separate document linked via user_id
+    profile = await Profile.find_one(Profile.user_id == user.id)
+    if not profile:
+        profile = Profile(user_id=user.id, **profile_data)
+        await profile.insert()
     else:
         for key, value in profile_data.items():
-            setattr(user.profile, key, value)
-    await user.save()
-    return user.profile
+            setattr(profile, key, value)
+        await profile.save()
+    return profile

@@ -4,13 +4,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from db import init_db, close_db, init_redis, close_redis
-# ---------
-from redis import asyncio as aioredis
-from core.config import settings
-# -----------
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.decorator import cache
 from routes import auth_router, user_router, availability_router
 from routes.auth import get_current_user
 
@@ -59,21 +54,6 @@ app.include_router(user_router, dependencies=[Depends(get_current_user)])
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
-
-
-@app.get("/test-redis")
-async def force_redis_write():
-    # 1. Connect directly
-    r = aioredis.from_url(settings.REDIS_DB_URL, decode_responses=True)
-
-    # 2. Force a write with NO expiration
-    await r.set("TEST_KEY_HELLO", "Redis is working perfectly!")
-
-    # 3. Read it back
-    value = await r.get("TEST_KEY_HELLO")
-    await r.aclose()
-
-    return {"message": "Write attempted", "redis_returned": value}
 
 
 @app.exception_handler(StarletteHTTPException)

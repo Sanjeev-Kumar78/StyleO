@@ -17,6 +17,24 @@ ALGORITHM: str = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
+def validate_password(password: str) -> None:
+    """
+    Enforce server-side password strength rules.
+    Raises ValueError with a human-readable message on failure.
+    """
+    errors: list[str] = []
+    if len(password) < 6:
+        errors.append("at least 6 characters")
+    if not any(c.isupper() for c in password):
+        errors.append("at least one uppercase letter")
+    if not any(c.islower() for c in password):
+        errors.append("at least one lowercase letter")
+    if not any(c.isdigit() for c in password):
+        errors.append("at least one digit")
+    if errors:
+        raise ValueError(f"Password must contain {', '.join(errors)}")
+
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
