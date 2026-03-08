@@ -1,6 +1,6 @@
 import "../styles/Login.css";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import F1 from "../assets/F1.jpg";
 import F2 from "../assets/F2.jpg";
@@ -24,7 +24,7 @@ const Login: React.FC = () => {
     Math.floor(Math.random() * imagePath.length),
   );
 
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, user } = useAuth();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +54,13 @@ const Login: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Redirect if already logged in Run once
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="login-page">
@@ -136,13 +143,13 @@ const Login: React.FC = () => {
             )}
 
             <div className="form-options">
-              <label className="remember-me">
-                <input type="checkbox" className="checkbox" />
-                <span>Remember me</span>
-              </label>
-              <a href="/forgot-password" className="forgot-password">
+              <span
+                className="forgot-password"
+                style={{ opacity: 0.5, cursor: "not-allowed" }}
+                title="Coming soon"
+              >
                 Forgot Password?
-              </a>
+              </span>
             </div>
 
             <button

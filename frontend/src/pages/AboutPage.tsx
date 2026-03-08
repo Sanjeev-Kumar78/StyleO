@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavBar from "../components/NavBar";
 import "../styles/About.css";
+import { Link } from "react-router";
 
 // Comparison data — what sets StyleO apart from generic chatbots
 const COMPARISONS = [
@@ -152,7 +153,7 @@ const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 28 } as const,
   whileInView: { opacity: 1, y: 0 } as const,
   viewport: { once: true } as const,
-  transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 const AboutPage: React.FC = () => {
@@ -302,13 +303,15 @@ const AboutPage: React.FC = () => {
           <h2 className="ab-footer-h2">
             Your wardrobe deserves to be <em>intelligent.</em>
           </h2>
-          <motion.button
-            className="ab-footer-cta"
-            whileHover={{ scale: 1.04, boxShadow: "0 0 64px var(--accent-glow)" }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Start Free — Import Your Wardrobe
-          </motion.button>
+          <Link to="/signup">
+            <motion.button
+              className="ab-footer-cta"
+              whileHover={{ scale: 1.04, boxShadow: "0 0 64px var(--accent-glow)" }}
+              whileTap={{ scale: 0.97 }}
+              >
+              Start Free — Import Your Wardrobe
+            </motion.button>
+          </Link>
         </div>
       </motion.section>
     </div>

@@ -1,6 +1,6 @@
 import "../styles/Login.css";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import F1 from "../assets/F1.jpg";
 import F2 from "../assets/F2.jpg";
@@ -11,6 +11,9 @@ import Logo from "../components/Logo";
 import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import api from "../services/api";
+import { useDebounce } from "../hooks/useDebounce";
+import exportedRoutes from "../api/config";
 
 interface SignupFormData {
   username: string;
@@ -25,7 +28,7 @@ const Signup: React.FC = () => {
     Math.floor(Math.random() * imagePath.length),
   );
 
-  const { signup, googleLogin } = useAuth();
+  const { signup, googleLogin, user } = useAuth();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,8 +37,41 @@ const Signup: React.FC = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<SignupFormData>();
+
+  // username availability check
+  const checkUrl = exportedRoutes.check as string;
+  const usernameValue = watch("username", "");
+  const debouncedUsername = useDebounce(usernameValue, 300);
+  const [usernameStatus, setUsernameStatus] = useState<
+    "idle" | "checking" | "available" | "taken"
+  >("idle");
+
+  useEffect(() => {
+    if (!debouncedUsername || debouncedUsername.length < 3) {
+      setUsernameStatus("idle");
+      return;
+    }
+    let cancelled = false;
+    setUsernameStatus("checking");
+    api
+      .get(`${checkUrl}/username-available`, {
+        params: { username: debouncedUsername },
+      })
+      .then((res) => {
+        if (!cancelled) {
+          setUsernameStatus(res.data.available ? "available" : "taken");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setUsernameStatus("idle");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedUsername, checkUrl]);
 
   const onSubmit = async (data: SignupFormData) => {
     setServerError("");
@@ -46,7 +82,7 @@ const Signup: React.FC = () => {
         email: data.email,
         password: data.password,
       });
-      navigate("/login", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const data = error.response.data;
@@ -63,6 +99,13 @@ const Signup: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Redirect if already logged in Run once
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="login-page">
@@ -125,11 +168,31 @@ const Signup: React.FC = () => {
                   message:
                     "Username can only contain letters, numbers, and underscores",
                 },
+                onChange: (e) => {
+                  setValue("username", e.target.value.toLowerCase(), {
+                    shouldValidate: true,
+                  });
+                },
               })}
             />
             {errors.username && (
               <p className="text-xs text-red-500 -mt-2">
                 {errors.username.message}
+              </p>
+            )}
+            {!errors.username && usernameStatus === "checking" && (
+              <p className="text-xs -mt-2" style={{ color: "var(--text-dim)" }}>
+                Checking availability…
+              </p>
+            )}
+            {!errors.username && usernameStatus === "available" && (
+              <p className="text-xs -mt-2" style={{ color: "var(--accent)" }}>
+                ✓ Username is available
+              </p>
+            )}
+            {!errors.username && usernameStatus === "taken" && (
+              <p className="text-xs text-red-500 -mt-2">
+                ✗ Username is already taken
               </p>
             )}
 
