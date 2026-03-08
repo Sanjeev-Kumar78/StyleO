@@ -4,11 +4,12 @@ from core.security import (
     verify_access_token,
     hash_password,
     verify_password,
+    validate_password,
 )
-from db.CRUD import create_user
+from db.CRUD import create_user, is_email_taken, is_username_taken
 from core.config import settings
-from fastapi import APIRouter, Request, Response, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Request, Response, HTTPException, Depends, status, Form
+from fastapi.security import OAuth2PasswordBearer
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from models.Model import User, UserCreate, UserResponse, Provider
@@ -17,6 +18,16 @@ from pydantic import BaseModel
 
 class GoogleAuthRequest(BaseModel):
     credential: str
+
+
+class LoginRequestForm:
+    def __init__(
+        self,
+        email: str = Form(),
+        password: str = Form(),
+    ):
+        self.email = email
+        self.password = password
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -61,12 +72,32 @@ async def register(body: UserCreate, response: Response):
     Create a new user account.
 
     - Rejects duplicate email or username (HTTP 409).
-    - Stores a bcrypt hash of the password – plain text is never persisted.
+    - Stores an Argon2 hash of the password – plain text is never persisted.
     """
+    # perform availability checks early so we can return a clear 409 before
+    # doing expensive password hashing or touching the database further.
+    if await is_email_taken(body.email):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        )
+    if await is_username_taken(body.username):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username already taken",
+        )
+
+    try:
+        validate_password(body.password)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    # hashed password after validation checks
     hashed_password = hash_password(body.password)
     try:
         user: User = await create_user(body.username, body.email, hashed_password)
     except ValueError as e:
+        # create_user still raises on duplicates incase of race conditions;
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=str(e))
     except RuntimeError as e:
@@ -81,7 +112,7 @@ async def register(body: UserCreate, response: Response):
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,   # set to True in production (HTTPS only)
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=60 * 60 * 24,
     )
@@ -92,17 +123,18 @@ async def register(body: UserCreate, response: Response):
 @auth_router.post("/login")
 async def login(
     response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    form_data: LoginRequestForm = Depends(),
 ):
     """
     Authenticate with e-mail) + password
 
     Returns a signed JWT as both:
-    - a JSON body  `{"access_token": "...", "token_type": "bearer"}` (for
-      API / mobile clients), and
+    - a JSON body
+    ```{"access_token": "...", "token_type": "bearer"}``` 
+    (for API / mobile clients), and
     - an `httponly` cookie (for browser clients).
     """
-    user = await User.find_one(User.email == form_data.username)
+    user = await User.find_one(User.email == form_data.email)
     if user is None or user.hashed_password is None or not verify_password(
         form_data.password, user.hashed_password.get_secret_value()
     ):
@@ -122,7 +154,7 @@ async def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,   # set to True in production (HTTPS only)
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=60 * 60 * 24,
     )
@@ -175,14 +207,16 @@ async def google_auth(body: GoogleAuthRequest, response: Response):
         # Merge: update provider to google if it was local-only
         if user.provider == Provider.local:
             user.provider = Provider.google
+            user.hashed_password = None  # clear local password since Google is now the provider
             await user.save()
     else:
         # New user from Google — generate a unique username
         import secrets
         base_username = name.replace(" ", "_").lower() or "user"
         username = base_username
-        # Ensure unique username
-        while await User.find_one(User.username == username):
+        # ensure the username is not already taken; append random suffix until it is
+        # unique (using the same helper as the availability route).
+        while await is_username_taken(username):
             username = f"{base_username}_{secrets.token_hex(3)}"
 
         user = User(
@@ -204,7 +238,7 @@ async def google_auth(body: GoogleAuthRequest, response: Response):
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=60 * 60 * 24,
     )

@@ -8,7 +8,7 @@ class AvailabilityResponse(BaseModel):
     available: bool
 
 
-availability_router = APIRouter(prefix="/user", tags=["user"])
+availability_router = APIRouter(prefix="/check", tags=["availability"])
 
 
 # Custom cache key builders to include query parameters
