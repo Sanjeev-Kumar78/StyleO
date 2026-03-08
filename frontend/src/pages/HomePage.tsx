@@ -7,7 +7,6 @@ import {
   useInView,
   AnimatePresence,
 } from "framer-motion";
-import NavBar from "../components/NavBar";
 import "../styles/Home.css";
 import { MdLocalLaundryService } from "react-icons/md";
 import { Link } from "react-router";
@@ -686,7 +685,6 @@ const HomePage: React.FC = () => {
   //  render
   return (
     <div className="hp-root">
-      <NavBar />
       {/* Hero Section */}
       <section className="hp-hero-section">
         {/* Ambient radial glow — follows cursor + parallax counter-drift */}

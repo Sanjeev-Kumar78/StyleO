@@ -1,0 +1,5 @@
+@reference "tailwindcss";
+
+.main {
+  @apply pt-16 md:pt-20;
+}

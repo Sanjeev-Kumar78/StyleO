@@ -160,7 +160,10 @@ const ProtectedNavBar = () => {
         </ul>
 
         {/* User info + actions */}
-        <div className="nav-search" style={{ justifyContent: "center", gap: "0.5rem" }}>
+        <div
+          className="nav-search"
+          style={{ justifyContent: "center", gap: "0.5rem" }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
@@ -175,13 +178,22 @@ const ProtectedNavBar = () => {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
-          <span style={{ fontSize: "0.85rem", fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span
+            style={{
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+            }}
+          >
             {user?.username}
           </span>
         </div>
 
         {/* Theme + Logout */}
-        <div className="nav-theme-btn" style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <div
+          className="nav-theme-btn"
+          style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+        >
           <ThemeButton />
           <button
             onClick={handleLogout}

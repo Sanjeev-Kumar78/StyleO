@@ -8,35 +8,41 @@ const COMPARISONS = [
   {
     feature: "Wardrobe Memory",
     chatgpt: "Forgets after each conversation. No persistent clothing data.",
-    styleo: "Remembers every garment you've uploaded — brand, color, category, and photo.",
+    styleo:
+      "Remembers every garment you've uploaded — brand, color, category, and photo.",
     chatgptBadge: "Stateless",
     styleoBadge: "Persistent",
   },
   {
     feature: "Garment Lifecycle",
     chatgpt: "No concept of wear status. Can't know what's clean or dirty.",
-    styleo: "Tracks clean → worn → in laundry → clean. Never suggests dirty clothes.",
+    styleo:
+      "Tracks clean → worn → in laundry → clean. Never suggests dirty clothes.",
     chatgptBadge: "Unavailable",
     styleoBadge: "Real-time",
   },
   {
     feature: "Context Awareness",
-    chatgpt: "Only responds to your text prompt. No weather, calendar, or event integration.",
-    styleo: "Cross-references weather, calendar events, and dress codes to assemble outfits.",
+    chatgpt:
+      "Only responds to your text prompt. No weather, calendar, or event integration.",
+    styleo:
+      "Cross-references weather, calendar events, and dress codes to assemble outfits.",
     chatgptBadge: "Text only",
     styleoBadge: "Multi-signal",
   },
   {
     feature: "Outfit Assembly",
     chatgpt: "Gives generic text suggestions like 'wear a blazer with chinos'.",
-    styleo: "Picks specific items from YOUR wardrobe and shows the assembled outfit visually.",
+    styleo:
+      "Picks specific items from YOUR wardrobe and shows the assembled outfit visually.",
     chatgptBadge: "Generic",
     styleoBadge: "Personalized",
   },
   {
     feature: "Wear Analytics",
     chatgpt: "No tracking. No data on what you've worn or how often.",
-    styleo: "Tracks frequency, last worn date, repeat avoidance, and underused items.",
+    styleo:
+      "Tracks frequency, last worn date, repeat avoidance, and underused items.",
     chatgptBadge: "None",
     styleoBadge: "Full tracking",
   },
@@ -44,39 +50,98 @@ const COMPARISONS = [
 
 // SVG icon components — crisp, custom, not emoji
 const IconZap = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
   </svg>
 );
 
 const IconRepeat = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" />
-    <path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" />
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17 1l4 4-4 4" />
+    <path d="M3 11V9a4 4 0 014-4h14" />
+    <path d="M7 23l-4-4 4-4" />
+    <path d="M21 13v2a4 4 0 01-4 4H3" />
   </svg>
 );
 
 const IconCloud = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />
   </svg>
 );
 
 const IconBarChart = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="12" width="4" height="9" rx="1" /><rect x="10" y="7" width="4" height="14" rx="1" /><rect x="17" y="3" width="4" height="18" rx="1" />
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="12" width="4" height="9" rx="1" />
+    <rect x="10" y="7" width="4" height="14" rx="1" />
+    <rect x="17" y="3" width="4" height="18" rx="1" />
   </svg>
 );
 
 const IconDroplet = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
   </svg>
 );
 
 const IconBriefcase = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="7" width="20" height="14" rx="2" />
+    <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
   </svg>
 );
 
@@ -159,8 +224,6 @@ const fadeUp = (delay = 0) => ({
 const AboutPage: React.FC = () => {
   return (
     <div className="ab-root">
-      <NavBar />
-
       {/* Hero */}
       <section className="ab-hero">
         <div className="ab-hero-glow" />
@@ -184,7 +247,10 @@ const AboutPage: React.FC = () => {
             conversation. It&apos;s a dedicated wardrobe intelligence platform
             that remembers every garment you own, tracks wear cycles, reads the
             weather, checks your calendar — and assembles outfits from{" "}
-            <strong style={{ color: "var(--text-primary)" }}>your actual clothes</strong>.
+            <strong style={{ color: "var(--text-primary)" }}>
+              your actual clothes
+            </strong>
+            .
           </p>
         </motion.div>
       </section>
@@ -201,15 +267,20 @@ const AboutPage: React.FC = () => {
               ChatGPT & Gemini <em>Suggest.</em> StyleO <em>Knows.</em>
             </h2>
             <p className="ab-section-sub">
-              General-purpose chatbots give you generic fashion advice without knowing
-              what you own. StyleO is purpose-built for wardrobe management — with persistent
-              memory, lifecycle tracking, and real context signals.
+              General-purpose chatbots give you generic fashion advice without
+              knowing what you own. StyleO is purpose-built for wardrobe
+              management — with persistent memory, lifecycle tracking, and real
+              context signals.
             </p>
           </motion.div>
 
           <div className="ab-compare-grid">
             {COMPARISONS.map((item, i) => (
-              <motion.div key={item.feature} className="ab-compare-card" {...fadeUp(i * 0.06)}>
+              <motion.div
+                key={item.feature}
+                className="ab-compare-card"
+                {...fadeUp(i * 0.06)}
+              >
                 <div className="ab-compare-side">
                   <span className="ab-compare-label">ChatGPT / Gemini</span>
                   <p className="ab-compare-feature">{item.feature}</p>
@@ -219,7 +290,9 @@ const AboutPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="ab-compare-side ab-compare-side--styleo">
-                  <span className="ab-compare-label ab-compare-label--accent">StyleO</span>
+                  <span className="ab-compare-label ab-compare-label--accent">
+                    StyleO
+                  </span>
                   <p className="ab-compare-feature">{item.feature}</p>
                   <p className="ab-compare-desc">{item.styleo}</p>
                   <span className="ab-compare-badge ab-compare-badge--accent">
@@ -251,7 +324,11 @@ const AboutPage: React.FC = () => {
 
           <div className="ab-benefits-grid">
             {BENEFITS.map((b, i) => (
-              <motion.div key={b.title} className="ab-benefit-card" {...fadeUp(i * 0.06)}>
+              <motion.div
+                key={b.title}
+                className="ab-benefit-card"
+                {...fadeUp(i * 0.06)}
+              >
                 <div className="ab-benefit-icon">{b.icon}</div>
                 <h3 className="ab-benefit-title">{b.title}</h3>
                 <p className="ab-benefit-desc">{b.desc}</p>
@@ -280,12 +357,18 @@ const AboutPage: React.FC = () => {
 
           <div className="ab-constraints-grid">
             {CONSTRAINTS.map((c, i) => (
-              <motion.div key={c.title} className="ab-constraint-card" {...fadeUp(i * 0.06)}>
+              <motion.div
+                key={c.title}
+                className="ab-constraint-card"
+                {...fadeUp(i * 0.06)}
+              >
                 <div className="ab-constraint-num">{i + 1}</div>
                 <div>
                   <p className="ab-constraint-title">{c.title}</p>
                   <p className="ab-constraint-desc">{c.desc}</p>
-                  <span className={`ab-difficulty ab-difficulty--${c.difficulty}`}>
+                  <span
+                    className={`ab-difficulty ab-difficulty--${c.difficulty}`}
+                  >
                     {c.difficulty} friction
                   </span>
                 </div>
@@ -306,9 +389,12 @@ const AboutPage: React.FC = () => {
           <Link to="/signup">
             <motion.button
               className="ab-footer-cta"
-              whileHover={{ scale: 1.04, boxShadow: "0 0 64px var(--accent-glow)" }}
+              whileHover={{
+                scale: 1.04,
+                boxShadow: "0 0 64px var(--accent-glow)",
+              }}
               whileTap={{ scale: 0.97 }}
-              >
+            >
               Start Free — Import Your Wardrobe
             </motion.button>
           </Link>

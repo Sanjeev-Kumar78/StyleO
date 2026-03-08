@@ -7,6 +7,7 @@ import {
   type SignupData,
 } from "./AuthContext";
 import exportedRoutes from "../api/config";
+import { redirect } from "react-router";
 
 const authUrl = exportedRoutes.auth as string;
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -65,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await api.post(`${authUrl}/logout`);
     } finally {
       setUser(null);
+      redirect("/login");
     }
   };
 
