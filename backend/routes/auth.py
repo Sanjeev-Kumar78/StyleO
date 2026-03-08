@@ -5,6 +5,7 @@ from core.security import (
     hash_password,
     verify_password,
 )
+from db.CRUD import create_user
 from core.config import settings
 from fastapi import APIRouter, Request, Response, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -16,6 +17,7 @@ from pydantic import BaseModel
 
 class GoogleAuthRequest(BaseModel):
     credential: str
+
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
@@ -53,28 +55,38 @@ async def get_current_user(
     return user
 
 
-@auth_router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(body: UserCreate):
+@auth_router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register(body: UserCreate, response: Response):
     """
     Create a new user account.
 
     - Rejects duplicate email or username (HTTP 409).
     - Stores a bcrypt hash of the password – plain text is never persisted.
     """
-    if await User.find_one(User.email == body.email):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="Email already registered")
-    if await User.find_one(User.username == body.username):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="Username already taken")
-
-    user = User(
-        username=body.username,
-        email=body.email,
-        hashed_password=hash_password(body.password),
+    hashed_password = hash_password(body.password)
+    try:
+        user: User = await create_user(body.username, body.email, hashed_password)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
+        )
+    # Set the cookie or return the token as needed
+    token = create_access_token(data={"sub": str(user.id)})
+    # Cookie delivery (browser clients)
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,   # set to True in production (HTTPS only)
+        samesite="lax",
+        max_age=60 * 60 * 24,
     )
-    await user.insert()
-    return user
+    # Header delivery (API / mobile clients)
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @auth_router.post("/login")

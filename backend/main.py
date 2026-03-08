@@ -1,17 +1,50 @@
 from fastapi import FastAPI, Request, Depends
+from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from db import init_db, close_db
-from routes import auth_router, user_router
+from db import init_db, close_db, init_redis, close_redis
+# ---------
+from redis import asyncio as aioredis
+from core.config import settings
+# -----------
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+from routes import auth_router, user_router, availability_router
 from routes.auth import get_current_user
-app = FastAPI(title="StyleO API",
+
+
+class ServiceUnavailable(Exception):
+    def __init__(self, detail: str = "Service temporarily unavailable"):
+        self.detail = detail
+
+
+# Startup and Shutdown Events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        await init_db()
+        redis_client = await init_redis()
+        FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
+        yield
+    except Exception as e:
+        print(f"Error during startup: {e}")
+        raise ServiceUnavailable("Failed to initialize services")
+    finally:
+        await close_db()
+        await close_redis()
+
+# App Instance
+app = FastAPI(title="StyleO API", lifespan=lifespan,
               description="API for StyleO", version="1.0.0")
 
 # Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # update for production
+    # update for production
+    allow_origins=["http://localhost:5173",
+                   "https://cindi-earthquaked-dictatorially.ngrok-free.dev"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -19,26 +52,30 @@ app.add_middleware(
 
 # Routes
 app.include_router(auth_router)
+app.include_router(availability_router)
 app.include_router(user_router, dependencies=[Depends(get_current_user)])
-
-
-@app.on_event("startup")
-async def startup_event():
-    await init_db()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await close_db()
 
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
 
-class ServiceUnavailable(Exception):
-    def __init__(self, detail: str = "Service temporarily unavailable"):
-        self.detail = detail
+
+@app.get("/test-redis")
+async def force_redis_write():
+    # 1. Connect directly
+    r = aioredis.from_url(settings.REDIS_DB_URL, decode_responses=True)
+
+    # 2. Force a write with NO expiration
+    await r.set("TEST_KEY_HELLO", "Redis is working perfectly!")
+
+    # 3. Read it back
+    value = await r.get("TEST_KEY_HELLO")
+    await r.aclose()
+
+    return {"message": "Write attempted", "redis_returned": value}
+
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
@@ -61,12 +98,16 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         status_code=exc.status_code,
         content={"error": "http_error", "message": exc.detail},
     )
+
+
 @app.exception_handler(ServiceUnavailable)
 async def service_unavailable_handler(request: Request, exc: ServiceUnavailable):
     return JSONResponse(
         status_code=503,
         content={"error": "service_unavailable", "message": exc.detail},
     )
+
+
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     return JSONResponse(

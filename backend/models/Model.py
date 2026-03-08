@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field, SecretStr
+from pydantic import BaseModel, EmailStr, Field, SecretStr, field_validator
 from beanie import Document, PydanticObjectId
 from datetime import datetime, timezone
 from pymongo import IndexModel, ASCENDING, DESCENDING
@@ -127,6 +127,12 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
+
+    # runs when a request hits "/ register" and ensures consistent formatting
+    @field_validator('username', 'email')
+    @classmethod
+    def sanitize_and_lowercase(cls, value: str) -> str:
+        return value.lower().strip()
 
 
 class UserResponse(BaseModel):
