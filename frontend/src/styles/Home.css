@@ -34,7 +34,10 @@
 
 /* PAGE ROOT */
 .hp-root {
-  @apply min-h-screen overflow-x-hidden bg-(--bg);
+  @apply overflow-x-hidden bg-(--bg);
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y proximity;
   transition: background-color 0.35s ease;
 }
 
@@ -164,6 +167,8 @@
   @apply relative flex items-center;
   min-height: 100vh;
   padding-top: 5rem;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* Ambient glow blob */
@@ -413,6 +418,7 @@
   @apply relative;
   padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 2rem);
   border-top: 1px solid var(--border-subtle);
+  scroll-snap-align: start;
 }
 
 .hp-lifecycle-grid {
@@ -534,9 +540,23 @@
 
 /* Weather card */
 .hp-weather-card {
-  @apply rounded-2xl bg-(--bg-elevated) border-(--border) blur-[20px];
+  @apply rounded-2xl bg-(--bg-elevated) border-(--border);
   padding: 1.5rem;
   transition: box-shadow 0.25s ease;
+}
+
+.hp-weather-preview-badge {
+  @apply rounded-full bg-(--surface-1) text-(--text-dim) border-(--border);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.65rem;
+  letter-spacing: 0.06em;
+}
+
+.hp-weather-location-prompt {
+  @apply flex items-center gap-1.5 text-(--text-dim) mt-4 pt-3 border-t-(--border);
+  font-size: 0.72rem;
+  font-family: var(--font-body);
+  opacity: 0.65;
 }
 
 .hp-weather-card:hover {

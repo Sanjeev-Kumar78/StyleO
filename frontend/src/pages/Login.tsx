@@ -11,6 +11,7 @@ import Logo from "../components/Logo";
 import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { FaArrowLeft } from "react-icons/fa6";
 
 interface LoginFormData {
   email: string;
@@ -67,6 +68,14 @@ const Login: React.FC = () => {
       <div className="fixed top-3 right-4 z-50">
         <ThemeButton />
       </div>
+      {/* Back to Home Button */}
+      <Link to="/" className="top-3 left-4 z-50 back-home-button">
+        {/* Display Ruby for it */}
+        <span>
+          <FaArrowLeft /> Back to Home
+        </span>
+      </Link>
+
       <div className="left-image-section">
         {/* Image with Login / Signup Switch Button */}
         <img

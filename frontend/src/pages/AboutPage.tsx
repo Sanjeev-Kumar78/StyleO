@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import NavBar from "../components/NavBar";
 import "../styles/About.css";
 import { Link } from "react-router";
 
@@ -215,7 +214,7 @@ const CONSTRAINTS = [
 
 // Shared animation preset
 const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 28 } as const,
+  initial: { opacity: 0, y: 18 } as const,
   whileInView: { opacity: 1, y: 0 } as const,
   viewport: { once: true } as const,
   transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },

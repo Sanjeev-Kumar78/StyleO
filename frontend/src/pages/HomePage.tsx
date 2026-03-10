@@ -634,8 +634,11 @@ const HomePage: React.FC = () => {
     return () => cancelAnimationFrame(rafRef.current);
   }, [mouse]);
 
+  /*  Scroll container ref (hp-root is the scroll container)  */
+  const rootRef = useRef<HTMLDivElement>(null);
+
   /*  Page-level scroll for parallax  */
-  const { scrollY } = useScroll();
+  const { scrollY } = useScroll({ container: rootRef });
 
   // Hero: jacket drifts up at 30% of scroll speed (parallax)
   const rawJacketY = useTransform(scrollY, [0, 700], [0, -90]);
@@ -684,7 +687,7 @@ const HomePage: React.FC = () => {
 
   //  render
   return (
-    <div className="hp-root">
+    <div ref={rootRef} className="hp-root">
       {/* Hero Section */}
       <section className="hp-hero-section">
         {/* Ambient radial glow — follows cursor + parallax counter-drift */}
@@ -964,10 +967,8 @@ const HomePage: React.FC = () => {
                 transition={{ duration: 0.7, delay: 0.1 }}
               >
                 <div className="hp-weather-card-header">
-                  <span className="hp-weather-location">
-                    Today · London, UK
-                  </span>
-                  <span className="hp-weather-live-badge">Live</span>
+                  <span className="hp-weather-location">Today · Your City</span>
+                  <span className="hp-weather-preview-badge">Preview</span>
                 </div>
                 <div className="hp-weather-body">
                   <div>
@@ -990,6 +991,28 @@ const HomePage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                <p className="hp-weather-location-prompt">
+                  <svg
+                    viewBox="0 0 16 16"
+                    width="12"
+                    height="12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path
+                      d="M8 8.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 1.5C5.515 1.5 3.5 3.515 3.5 6c0 3.75 4.5 8.5 4.5 8.5S12.5 9.75 12.5 6c0-2.485-2.015-4.5-4.5-4.5Z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Enable location in settings for live local weather
+                </p>
               </motion.div>
 
               {/* Calendar card */}

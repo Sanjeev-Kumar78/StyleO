@@ -14,6 +14,7 @@ import axios from "axios";
 import api from "../services/api";
 import { useDebounce } from "../hooks/useDebounce";
 import exportedRoutes from "../api/config";
+import { FaArrowLeft } from "react-icons/fa6";
 
 interface SignupFormData {
   username: string;
@@ -112,6 +113,14 @@ const Signup: React.FC = () => {
       <div className="fixed top-3 right-4 z-50">
         <ThemeButton />
       </div>
+      {/* Back to Home Button */}
+
+      <Link to="/" className="top-3 left-4 z-50 back-home-button">
+        {/* Display Ruby for it */}
+        <span>
+          <FaArrowLeft /> Back to Home
+        </span>
+      </Link>
 
       {/* Left image section */}
       <div className="left-image-section">
