@@ -1,5 +1,398 @@
 @reference "tailwindcss";
 
-.main {
-  @apply pt-16 md:pt-20;
+@keyframes dbShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Page wrapper */
+.db-root {
+  @apply overflow-x-hidden bg-(--bg) min-h-screen transition-colors duration-350;
+  padding-top: clamp(4.5rem, 8vw, 5.5rem);
+}
+
+.db-container {
+  @apply mx-auto;
+  max-width: 82rem;
+  padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+/* Hero section with ambient glow and dot grid background */
+.db-hero {
+  @apply relative;
+  padding: clamp(2rem, 4vw, 3.5rem) 0;
+}
+
+.db-hero-glow {
+  @apply absolute pointer-events-none rounded-full;
+  top: -40%;
+  right: -10%;
+  width: clamp(300px, 50vw, 600px);
+  height: clamp(300px, 50vw, 600px);
+  background: radial-gradient(ellipse, var(--hero-glow-color) 0%, transparent 65%);
+  filter: blur(48px);
+}
+
+.db-dot-grid {
+  @apply absolute inset-0 pointer-events-none;
+  background-image: radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+}
+
+.db-hero-content {
+  @apply relative z-10 flex flex-wrap items-end justify-between gap-6;
+}
+
+/* Stack hero content vertically on mobile */
+@media (max-width: 768px) {
+  .db-hero-content {
+    @apply flex-col items-start;
+  }
+}
+
+.db-hero-text {
+  @apply flex-1;
+  min-width: 300px;
+}
+
+/* Small label above headline */
+.db-eyebrow {
+  @apply flex items-center gap-3 mb-4;
+}
+
+.db-eyebrow-line {
+  @apply shrink-0 h-px w-8 bg-(--accent);
+}
+
+.db-eyebrow-text {
+  @apply uppercase text-(--accent) tracking-[0.2em] font-(family-name:--font-body);
+  font-size: 0.7rem;
+}
+
+.db-hero-h1 {
+  @apply mb-2 text-(--text-primary) font-(family-name:--font-display) font-light leading-tight;
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+}
+
+.db-hero-h1 em {
+  @apply italic text-(--accent) font-light;
+}
+
+.db-hero-sub {
+  @apply text-(--text-dim) font-light leading-relaxed;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+  max-width: 480px;
+}
+
+/* Email, join date, settings link */
+.db-hero-meta {
+  @apply flex items-center flex-wrap gap-6 text-(--text-dim);
+  font-size: 0.78rem;
+}
+
+.db-hero-meta-item {
+  @apply flex items-center gap-1.5;
+}
+
+.db-hero-link {
+  @apply text-(--accent) no-underline font-medium transition-opacity duration-200 hover:opacity-80;
+  font-size: 0.78rem;
+}
+
+/* Stats cards grid */
+.db-stats-section {
+  padding: clamp(1.5rem, 3vw, 2.5rem) 0;
+}
+
+.db-stats-grid {
+  @apply grid grid-cols-2 lg:grid-cols-4;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.db-stat-card {
+  @apply relative overflow-hidden rounded-2xl bg-(--bg-elevated) border border-(--border-subtle) transition-all duration-250 hover:-translate-y-[3px] hover:border-(--border-hi);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (max-width: 640px) {
+  .db-stat-card {
+    padding: 1rem;
+  }
+}
+
+.db-stat-card:hover {
+  box-shadow: 0 8px 32px var(--shadow-heavy);
+}
+
+/* Subtle glow on hover, positioned behind the card content */
+.db-stat-card::before {
+  content: "";
+  @apply absolute pointer-events-none;
+  top: -30%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, var(--accent-surface) 0%, transparent 70%);
+  filter: blur(20px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.db-stat-card:hover::before {
+  opacity: 1;
+}
+
+.db-stat-card-icon {
+  @apply flex items-center justify-center rounded-xl w-9 h-9 mb-3 bg-(--accent-dim) border border-(--accent-border) text-(--accent) sm:w-10 sm:h-10 sm:mb-4;
+}
+
+.db-stat-card-value {
+  @apply text-(--text-primary) font-(family-name:--font-body) font-semibold leading-none mb-1 capitalize;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.db-stat-card-label {
+  @apply text-(--text-dim) tracking-wide;
+  font-size: 0.78rem;
+}
+
+.db-stat-card-accent {
+  @apply text-(--accent) font-medium mt-2;
+  font-size: 0.72rem;
+}
+
+/* Quick action buttons (Upload, Recommendations) */
+.db-actions-section {
+  padding: clamp(0.5rem, 1vw, 1rem) 0 clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.db-actions-row {
+  @apply flex flex-wrap;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+@media (max-width: 640px) {
+  .db-actions-row {
+    @apply flex-col;
+  }
+}
+
+.db-action-btn {
+  @apply inline-flex items-center justify-center rounded-full no-underline font-(family-name:--font-body) font-medium tracking-wide transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent);
+  padding: 0.875rem 2rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .db-action-btn {
+    @apply w-full;
+  }
+}
+
+.db-action-btn-primary {
+  @apply bg-(--accent) text-(--accent-text);
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+
+.db-action-btn-primary:hover {
+  @apply -translate-y-0.5;
+  box-shadow: 0 0 48px var(--accent-glow), 0 0 0 1px var(--accent-border);
+}
+
+.db-action-btn-secondary {
+  @apply bg-(--accent-surface) text-(--accent) border border-(--accent-border);
+}
+
+.db-action-btn-secondary:hover {
+  @apply bg-(--accent-dim) -translate-y-0.5;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.db-action-btn svg {
+  @apply mr-2 w-4 h-4;
+}
+
+/* Recent items section with divider */
+.db-recent-section {
+  @apply border-t border-(--border-subtle);
+  padding: clamp(1rem, 2vw, 2rem) 0 clamp(2rem, 4vw, 4rem);
+}
+
+.db-recent-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.db-recent-title {
+  @apply text-(--text-primary) font-(family-name:--font-display) font-light;
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+}
+
+.db-recent-count {
+  @apply rounded-full bg-(--accent-badge-bg) text-(--accent) border border-(--accent-badge-border) font-(family-name:--font-body);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.7rem;
+}
+
+.db-items-grid {
+  @apply grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: clamp(0.875rem, 1.5vw, 1.25rem);
+}
+
+@media (max-width: 600px) {
+  .db-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Individual wardrobe item card */
+.db-item-card {
+  @apply relative overflow-hidden rounded-2xl bg-(--card-bg) border border-(--border) transition-all duration-200 hover:-translate-y-1 cursor-pointer;
+}
+
+.db-item-card:hover {
+  box-shadow: 0 8px 28px var(--shadow-heavy);
+}
+
+/* Clean/Worn badge in top-right corner */
+.db-item-card-badge {
+  @apply absolute top-2 right-2 z-10 rounded-full tracking-wide font-(family-name:--font-body) font-medium border;
+  font-size: 0.6rem;
+  padding: 0.15rem 0.5rem;
+}
+
+.db-item-card-badge--clean {
+  @apply bg-(--accent-badge-bg) text-(--accent) border-(--accent-badge-border);
+}
+
+.db-item-card-badge--dirty {
+  @apply bg-(--warn-badge-bg) text-(--warn) border-(--warn-badge-border);
+}
+
+.db-item-card-thumb {
+  @apply relative flex items-center justify-center overflow-hidden bg-(--surface-1) h-48;
+}
+
+.db-item-card-thumb img {
+  @apply w-full h-full object-cover transition-transform duration-300;
+}
+
+/* Slight zoom on hover */
+.db-item-card:hover .db-item-card-thumb img {
+  @apply scale-105;
+}
+
+/* AI description overlay that fades in on hover */
+.db-item-card-overlay {
+  @apply absolute inset-0 flex flex-col justify-end p-3 opacity-0 transition-opacity duration-250;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+}
+
+.db-item-card:hover .db-item-card-overlay {
+  @apply opacity-100;
+}
+
+.db-item-card-overlay-text {
+  @apply text-white leading-snug line-clamp-3;
+  font-size: 0.72rem;
+}
+
+/* Icon fallback when no image is available */
+.db-item-card-placeholder {
+  @apply flex items-center justify-center bg-(--surface-1) h-48 text-(--text-dim);
+}
+
+.db-item-card-body {
+  @apply px-3 py-3;
+}
+
+.db-item-card-type {
+  @apply font-medium text-(--text-primary) truncate capitalize leading-tight;
+  font-size: 0.82rem;
+}
+
+.db-item-card-meta {
+  @apply flex items-center gap-2 mt-1;
+}
+
+.db-item-card-color-dot {
+  @apply shrink-0 w-2 h-2 rounded-full border border-(--border);
+}
+
+.db-item-card-color-label {
+  @apply text-(--text-dim) truncate capitalize;
+  font-size: 0.72rem;
+}
+
+/* Empty state shown when user has no wardrobe items */
+.db-empty {
+  @apply text-center;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 3vw, 2rem);
+}
+
+.db-empty-icon {
+  @apply mx-auto mb-6 flex items-center justify-center rounded-2xl w-20 h-20 bg-(--accent-dim) text-(--accent);
+  border: 1.5px solid var(--accent-border);
+}
+
+.db-empty-h2 {
+  @apply mb-3 text-(--text-primary) font-(family-name:--font-display) font-light;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.db-empty-body {
+  @apply text-(--text-dim) mx-auto mb-8 leading-relaxed;
+  font-size: 0.92rem;
+  max-width: 440px;
+}
+
+/* Onboarding checklist (3 steps) */
+.db-checklist {
+  @apply mx-auto text-left;
+  max-width: 360px;
+}
+
+.db-checklist-item {
+  @apply flex items-start gap-3 text-(--text-dim);
+  padding: 0.625rem 0;
+  font-size: 0.88rem;
+}
+
+.db-checklist-item + .db-checklist-item {
+  @apply border-t border-(--border-subtle);
+}
+
+.db-checklist-num {
+  @apply flex items-center justify-center shrink-0 rounded-full font-semibold bg-(--accent-dim) text-(--accent) border border-(--accent-border);
+  width: 24px;
+  height: 24px;
+  font-size: 0.7rem;
+}
+
+.db-checklist-text {
+  padding-top: 0.1rem;
+}
+
+.db-checklist-text strong {
+  @apply text-(--text-primary) font-medium;
+}
+
+/* Shimmer skeleton used while data is loading */
+.db-skeleton {
+  @apply rounded-2xl border border-(--border);
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background-size: 200% 100%;
+  animation: dbShimmer 1.8s ease infinite;
+}
+
+.db-skeleton--stat {
+  height: 130px;
+}
+
+.db-skeleton--card {
+  @apply rounded-xl;
+  height: 220px;
 }

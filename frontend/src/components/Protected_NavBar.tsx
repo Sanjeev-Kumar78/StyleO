@@ -10,6 +10,7 @@ const navItems = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/profile", label: "Profile" },
   { path: "/settings", label: "Settings" },
+  { path: "/wardrobe", label: "Wardrobe" },
 ];
 
 const ProtectedNavBar = () => {
@@ -195,27 +196,30 @@ const ProtectedNavBar = () => {
           style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
         >
           <ThemeButton />
-          <button
-            onClick={handleLogout}
-            className="theme-toggle"
-            aria-label="Logout"
-            title="Logout"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {/* Logout icon — desktop only; mobile uses hamburger menu */}
+          <div className="hidden md:block">
+            <button
+              onClick={handleLogout}
+              className="theme-toggle"
+              aria-label="Logout"
+              title="Logout"
             >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-          </button>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 

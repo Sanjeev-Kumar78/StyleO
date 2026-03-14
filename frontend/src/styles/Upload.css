@@ -1,0 +1,364 @@
+@reference "tailwindcss";
+
+@keyframes uploadSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Page wrapper */
+.up-root {
+  @apply overflow-x-hidden bg-(--bg) min-h-screen transition-colors duration-350;
+  padding-top: clamp(4.5rem, 8vw, 5.5rem);
+}
+
+.up-container {
+  @apply mx-auto;
+  max-width: 52rem;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 5vw, 3.5rem);
+}
+
+/* Back link pinned to the top-left */
+.up-back-top {
+  @apply inline-flex items-center gap-1.5 text-(--text-dim) no-underline font-medium transition-colors duration-200 hover:text-(--accent) mb-6;
+  font-size: 0.82rem;
+}
+
+/* Page header with eyebrow, title, and description */
+.up-header {
+  @apply mb-8;
+}
+
+.up-eyebrow {
+  @apply flex items-center gap-3 mb-4;
+}
+
+.up-eyebrow-line {
+  @apply shrink-0 h-px w-8 bg-(--accent);
+}
+
+.up-eyebrow-text {
+  @apply uppercase text-(--accent) tracking-[0.2em] font-(family-name:--font-body);
+  font-size: 0.7rem;
+}
+
+.up-h1 {
+  @apply mb-2 text-(--text-primary) font-(family-name:--font-display) font-light leading-tight;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+}
+
+.up-h1 em {
+  @apply italic text-(--accent) font-light;
+}
+
+.up-sub {
+  @apply text-(--text-dim) font-light leading-relaxed;
+  font-size: 0.9rem;
+}
+
+/* Elevated card wrapping the form */
+.up-card {
+  @apply rounded-2xl bg-(--bg-elevated) border border-(--border-subtle);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.up-form {
+  @apply flex flex-col gap-6;
+}
+
+/* Side-by-side front/back image upload slots */
+.up-images-row {
+  @apply grid gap-4;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 560px) {
+  .up-images-row {
+    @apply grid-cols-1;
+  }
+}
+
+/* Compact dropzone for front/back slots */
+.up-dropzone {
+  @apply relative flex flex-col items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-(--border-hi) bg-(--surface-1) transition-all duration-200;
+  padding: clamp(2rem, 5vw, 3rem) 1rem;
+}
+
+.up-dropzone--compact {
+  padding: clamp(1.5rem, 3vw, 2rem) 1rem;
+}
+
+.up-dropzone:hover,
+.up-dropzone--active {
+  @apply border-(--accent) bg-(--accent-surface);
+}
+
+.up-dropzone-icon {
+  @apply mb-2 text-(--accent);
+  opacity: 0.7;
+}
+
+.up-dropzone-text {
+  @apply text-(--text-dim) text-center leading-relaxed;
+  font-size: 0.82rem;
+}
+
+.up-dropzone-text strong {
+  @apply text-(--accent) font-medium;
+}
+
+.up-dropzone-hint {
+  @apply text-(--text-dim) mt-1;
+  font-size: 0.68rem;
+  opacity: 0.6;
+}
+
+/* Hidden file input covers the entire dropzone */
+.up-dropzone input[type="file"] {
+  @apply absolute inset-0 opacity-0 cursor-pointer w-full h-full;
+}
+
+/* Thumbnail preview after selecting an image */
+.up-preview-wrap {
+  @apply relative flex items-center justify-center rounded-xl overflow-hidden bg-(--surface-1);
+  height: 200px;
+}
+
+.up-preview-wrap img {
+  @apply w-full h-full object-contain;
+}
+
+.up-preview-remove {
+  @apply absolute top-2 right-2 flex items-center justify-center rounded-full cursor-pointer border-none outline-none text-white text-base transition-all duration-200 hover:scale-110;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.up-preview-remove:hover {
+  background: rgba(200, 50, 50, 0.8);
+}
+
+/* Label on image preview */
+.up-preview-label {
+  @apply absolute bottom-2 left-2 rounded-md bg-black/50 text-white text-xs px-2 py-0.5;
+  font-size: 0.68rem;
+}
+
+/* AI Fill button */
+.up-ai-fill-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full cursor-pointer border border-(--accent-border) bg-(--accent-surface) text-(--accent) font-(family-name:--font-body) font-medium tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.85rem;
+  align-self: flex-start;
+}
+
+.up-ai-fill-btn:hover:not(:disabled) {
+  @apply bg-(--accent-dim) -translate-y-0.5;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+/* AI badge shown next to field labels */
+.up-ai-badge {
+  @apply inline-flex items-center rounded-md bg-(--accent-surface) text-(--accent) border border-(--accent-border) font-semibold ml-2;
+  font-size: 0.58rem;
+  padding: 0.1rem 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+/* AI notice banner */
+.up-ai-notice {
+  @apply flex items-center gap-2 rounded-lg bg-(--accent-surface) border border-(--accent-border) text-(--accent);
+  padding: 0.6rem 1rem;
+  font-size: 0.78rem;
+}
+
+/* Form field layout */
+.up-field {
+  @apply flex flex-col gap-1.5;
+}
+
+.up-field-row {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+@media (max-width: 640px) {
+  .up-field-row {
+    @apply grid-cols-1;
+  }
+}
+
+.up-label {
+  @apply flex items-center text-(--text-dim) font-medium tracking-wide font-(family-name:--font-body);
+  font-size: 0.78rem;
+}
+
+.up-required {
+  @apply text-(--accent) ml-0.5;
+}
+
+/* Shared input and select styles */
+.up-input,
+.up-select {
+  @apply w-full rounded-lg bg-(--surface-1) border border-(--border) text-(--text-primary) outline-none font-(family-name:--font-body) transition-all duration-200;
+  padding: 0.7rem 0.875rem;
+  font-size: 0.875rem;
+}
+
+.up-input::placeholder {
+  @apply text-(--text-dim);
+  opacity: 0.5;
+}
+
+.up-input:focus,
+.up-select:focus {
+  @apply border-(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Ensure dropdown options are readable in all themes/browsers */
+.up-select option {
+  @apply bg-(--bg-elevated) text-(--text-primary);
+}
+
+/* Custom dropdown arrow for selects */
+.up-select {
+  @apply cursor-pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8d95' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+/* Primary submit button with glow */
+.up-submit {
+  @apply inline-flex items-center justify-center rounded-full cursor-pointer border-none outline-none bg-(--accent) text-(--accent-text) font-(family-name:--font-body) font-medium tracking-wide transition-all duration-200 mt-2 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent);
+  padding: 0.875rem 2.5rem;
+  font-size: 0.9rem;
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+
+.up-submit:hover:not(:disabled) {
+  @apply -translate-y-0.5;
+  box-shadow: 0 0 48px var(--accent-glow), 0 0 0 1px var(--accent-border);
+}
+
+/* Inline loading spinner */
+.up-spinner {
+  @apply inline-block rounded-full border-2 border-(--accent-text) mr-2;
+  width: 16px;
+  height: 16px;
+  border-top-color: transparent;
+  animation: uploadSpin 0.6s linear infinite;
+}
+
+/* Success and error feedback banners */
+.up-success {
+  @apply flex items-center gap-3 rounded-xl bg-(--accent-dim) border border-(--accent-border) text-(--accent) font-(family-name:--font-body);
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+}
+
+.up-success svg {
+  @apply shrink-0;
+}
+
+.up-error {
+  @apply flex items-center gap-3 rounded-xl font-(family-name:--font-body);
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  color: #e74c3c;
+}
+
+/* Bottom action row */
+.up-actions {
+  @apply flex items-center gap-4 flex-wrap;
+}
+
+/* Confirmation modal overlay */
+.up-confirm-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+}
+
+.up-confirm-modal {
+  @apply relative rounded-2xl bg-(--bg-elevated) border border-(--border-subtle);
+  width: 90%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.up-confirm-header {
+  @apply flex items-center justify-between sticky top-0 bg-(--bg-elevated) border-b border-(--border-subtle) z-10;
+  padding: 1.25rem 1.5rem;
+}
+
+.up-confirm-title {
+  @apply text-(--text-primary) font-(family-name:--font-display) font-light;
+  font-size: 1.2rem;
+}
+
+.up-confirm-close {
+  @apply flex items-center justify-center rounded-lg cursor-pointer border-none bg-transparent text-(--text-dim) transition-colors duration-200 hover:text-(--text-primary) hover:bg-(--surface-1);
+  width: 36px;
+  height: 36px;
+}
+
+.up-confirm-body {
+  padding: 1.5rem;
+}
+
+.up-confirm-images {
+  @apply flex gap-3 mb-5;
+}
+
+.up-confirm-thumb {
+  @apply rounded-lg object-contain bg-(--surface-1) border border-(--border);
+  height: 100px;
+  max-width: 50%;
+}
+
+.up-confirm-details {
+  @apply flex flex-col gap-0;
+}
+
+.up-confirm-row {
+  @apply flex items-center justify-between border-b border-(--border-subtle) text-(--text-dim);
+  padding: 0.65rem 0;
+  font-size: 0.85rem;
+}
+
+.up-confirm-row:last-child {
+  @apply border-b-0;
+}
+
+.up-confirm-row strong {
+  @apply text-(--text-primary) capitalize font-medium;
+}
+
+.up-confirm-footer {
+  @apply flex items-center justify-end gap-3 border-t border-(--border-subtle);
+  padding: 1rem 1.5rem;
+}
+
+.up-confirm-cancel {
+  @apply rounded-full cursor-pointer border border-(--border) bg-transparent text-(--text-dim) font-(family-name:--font-body) font-medium transition-all duration-200 hover:text-(--text-primary) hover:border-(--border-hi);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.85rem;
+}
+
+.up-confirm-submit {
+  @apply inline-flex items-center gap-2 rounded-full cursor-pointer border-none outline-none bg-(--accent) text-(--accent-text) font-(family-name:--font-body) font-medium tracking-wide transition-all duration-200;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.85rem;
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.up-confirm-submit:hover {
+  @apply -translate-y-0.5;
+  box-shadow: 0 0 40px var(--accent-glow), 0 0 0 1px var(--accent-border);
+}

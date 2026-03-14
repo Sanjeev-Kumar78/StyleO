@@ -12,24 +12,28 @@ import AboutPage from "./pages/AboutPage";
 import Signup from "./pages/Signup";
 import ContactPage from "./pages/ContactPage";
 import Dashboard from "./pages/Dashboard";
+import UploadItem from "./pages/UploadItem";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedNavBar from "./components/Protected_NavBar";
 import NavBar from "./components/NavBar";
+import Wardrobe from "./pages/Wardrobe";
 
 function ProtectedRoute() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null;
   return user ? <Outlet /> : <Navigate to="/login" replace={true} />;
 }
 
 const AppContent: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
   const showNavBar = !["/login", "/signup"].includes(location.pathname);
   return (
     <>
-      {showNavBar && (user ? <ProtectedNavBar /> : <NavBar />)}
+      {showNavBar && !loading && (user ? <ProtectedNavBar /> : <NavBar />)}
+
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -41,6 +45,8 @@ const AppContent: React.FC = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/wardrobe/new" element={<UploadItem />} />
+          <Route path="/wardrobe" element={<Wardrobe />} />
         </Route>
       </Routes>
     </>
