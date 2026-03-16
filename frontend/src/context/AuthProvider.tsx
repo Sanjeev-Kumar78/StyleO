@@ -7,7 +7,6 @@ import {
   type SignupData,
 } from "./AuthContext";
 import exportedRoutes from "../api/config";
-import { redirect } from "react-router";
 
 const authUrl = exportedRoutes.auth as string;
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -33,8 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    // Backend expects LoginRequestForm (form-data)
-    // The "email" field is used for authentication
     const formData = new URLSearchParams();
     formData.append("email", credentials.email);
     formData.append("password", credentials.password);
@@ -66,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await api.post(`${authUrl}/logout`);
     } finally {
       setUser(null);
-      redirect("/login");
+      window.location.assign("/login");
     }
   };
 

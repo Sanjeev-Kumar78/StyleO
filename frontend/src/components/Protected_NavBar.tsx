@@ -9,8 +9,7 @@ import { useAuth } from "../hooks/useAuth";
 const navItems = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/profile", label: "Profile" },
-  { path: "/settings", label: "Settings" },
-  { path: "/wardrobe", label: "Wardrobe" },
+  { path: "/closet", label: "Wardrobe" },
 ];
 
 const ProtectedNavBar = () => {

@@ -34,17 +34,35 @@ interface WardrobeItem {
 }
 
 const COLOR_MAP: Record<string, string> = {
-  red: "#e74c3c", blue: "#3498db", green: "#2ecc71", black: "#2c3e50",
-  white: "#ecf0f1", navy: "#2c3e72", grey: "#95a5a6", gray: "#95a5a6",
-  brown: "#8b6914", beige: "#d4c5a9", pink: "#e91e8a", purple: "#9b59b6",
-  yellow: "#f1c40f", orange: "#e67e22", cream: "#fffdd0", maroon: "#800000",
-  olive: "#808000", teal: "#008080",
+  red: "#e74c3c",
+  blue: "#3498db",
+  green: "#2ecc71",
+  black: "#2c3e50",
+  white: "#ecf0f1",
+  navy: "#2c3e72",
+  grey: "#95a5a6",
+  gray: "#95a5a6",
+  brown: "#8b6914",
+  beige: "#d4c5a9",
+  pink: "#e91e8a",
+  purple: "#9b59b6",
+  yellow: "#f1c40f",
+  orange: "#e67e22",
+  cream: "#fffdd0",
+  maroon: "#800000",
+  olive: "#808000",
+  teal: "#008080",
 };
 
-const colorToCss = (c: string) => COLOR_MAP[c.toLowerCase().trim()] ?? "#8a8d95";
+const colorToCss = (c: string) =>
+  COLOR_MAP[c.toLowerCase().trim()] ?? "#8a8d95";
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -56,13 +74,26 @@ const STATS_CONFIG = [
 ] as const;
 
 const ONBOARDING_STEPS = [
-  { bold: "Upload your first item", rest: " — snap a photo or use an existing image" },
-  { bold: "Complete your profile", rest: " — helps our AI personalise suggestions" },
-  { bold: "Get outfit suggestions", rest: " — AI-curated looks for any occasion" },
+  {
+    bold: "Upload your first item",
+    rest: " — snap a photo or use an existing image",
+  },
+  {
+    bold: "Complete your profile",
+    rest: " — helps our AI personalise suggestions",
+  },
+  {
+    bold: "Get outfit suggestions",
+    rest: " — AI-curated looks for any occasion",
+  },
 ];
 
 function StatCard({
-  icon: Icon, value, label, accent, delay,
+  icon: Icon,
+  value,
+  label,
+  accent,
+  delay,
 }: {
   icon: React.ElementType;
   value: string | number;
@@ -77,7 +108,9 @@ function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: EASE_OUT_EXPO }}
     >
-      <div className="db-stat-card-icon"><Icon size={20} /></div>
+      <div className="db-stat-card-icon">
+        <Icon size={20} />
+      </div>
       <div className="db-stat-card-value">{value}</div>
       <div className="db-stat-card-label">{label}</div>
       {accent && <div className="db-stat-card-accent">{accent}</div>}
@@ -86,7 +119,9 @@ function StatCard({
 }
 
 function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
-  const imageUrl = item.front_image_id ? `/wardrobe/image/${item.front_image_id}` : null;
+  const imageUrl = item.front_image_id
+    ? `/wardrobe/image/${item.front_image_id}`
+    : null;
 
   return (
     <motion.div
@@ -95,13 +130,19 @@ function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.45, delay, ease: EASE_OUT_EXPO }}
     >
-      <span className={`db-item-card-badge ${item.is_clean ? "db-item-card-badge--clean" : "db-item-card-badge--dirty"}`}>
+      <span
+        className={`db-item-card-badge ${item.is_clean ? "db-item-card-badge--clean" : "db-item-card-badge--dirty"}`}
+      >
         {item.is_clean ? "Clean" : "Worn"}
       </span>
 
       {imageUrl ? (
         <div className="db-item-card-thumb">
-          <img src={imageUrl} alt={`${item.item_type} – ${item.color}`} loading="lazy" />
+          <img
+            src={imageUrl}
+            alt={`${item.item_type} – ${item.color}`}
+            loading="lazy"
+          />
           {item.ai_description && (
             <div className="db-item-card-overlay">
               <p className="db-item-card-overlay-text">{item.ai_description}</p>
@@ -109,13 +150,18 @@ function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
           )}
         </div>
       ) : (
-        <div className="db-item-card-placeholder"><HiOutlinePhotograph size={32} /></div>
+        <div className="db-item-card-placeholder">
+          <HiOutlinePhotograph size={32} />
+        </div>
       )}
 
       <div className="db-item-card-body">
         <p className="db-item-card-type">{item.item_type}</p>
         <div className="db-item-card-meta">
-          <span className="db-item-card-color-dot" style={{ background: colorToCss(item.color) }} />
+          <span
+            className="db-item-card-color-dot"
+            style={{ background: colorToCss(item.color) }}
+          />
           <span className="db-item-card-color-label">{item.color}</span>
         </div>
       </div>
@@ -130,12 +176,21 @@ function useWardrobeData() {
   useEffect(() => {
     let cancelled = false;
 
-    api.get("/wardrobe/", { params: { skip: 0, limit: 100 } })
-      .then((res) => { if (!cancelled) setItems(res.data.items ?? []); })
+    api
+      .get("/wardrobe/", { params: { skip: 0, limit: 100 } })
+      .then((res) => {
+        if (cancelled) return;
+        const payload = res.data;
+        setItems(Array.isArray(payload) ? payload : (payload?.items ?? []));
+      })
       .catch(() => {})
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const stats = useMemo(() => {
@@ -157,29 +212,52 @@ function useWardrobeData() {
   }, [items]);
 
   const recentItems = useMemo(
-    () => [...items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 12),
+    () =>
+      [...items]
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
+        .slice(0, 12),
     [items],
   );
 
   return { items, loading, stats, recentItems };
 }
 
-function getStatValue(key: string, stats: ReturnType<typeof useWardrobeData>["stats"]): string | number {
+function getStatValue(
+  key: string,
+  stats: ReturnType<typeof useWardrobeData>["stats"],
+): string | number {
   switch (key) {
-    case "total": return stats.total;
-    case "clean": return stats.clean;
-    case "topType": return stats.topType?.[0] ?? "—";
-    case "topColor": return stats.topColor?.[0] ?? "—";
-    default: return "—";
+    case "total":
+      return stats.total;
+    case "clean":
+      return stats.clean;
+    case "topType":
+      return stats.topType?.[0] ?? "—";
+    case "topColor":
+      return stats.topColor?.[0] ?? "—";
+    default:
+      return "—";
   }
 }
 
-function getStatAccent(key: string, stats: ReturnType<typeof useWardrobeData>["stats"]): string | undefined {
+function getStatAccent(
+  key: string,
+  stats: ReturnType<typeof useWardrobeData>["stats"],
+): string | undefined {
   switch (key) {
-    case "clean": return stats.total > 0 ? `${Math.round((stats.clean / stats.total) * 100)}% ready` : undefined;
-    case "topType": return stats.topType ? `${stats.topType[1]}× items` : undefined;
-    case "topColor": return stats.topColor ? `${stats.topColor[1]}× items` : undefined;
-    default: return undefined;
+    case "clean":
+      return stats.total > 0
+        ? `${Math.round((stats.clean / stats.total) * 100)}% ready`
+        : undefined;
+    case "topType":
+      return stats.topType ? `${stats.topType[1]}× items` : undefined;
+    case "topColor":
+      return stats.topColor ? `${stats.topColor[1]}× items` : undefined;
+    default:
+      return undefined;
   }
 }
 
@@ -191,7 +269,6 @@ export default function Dashboard() {
   return (
     <div className="db-root">
       <div className="db-container">
-
         {/* Hero */}
         <section className="db-hero">
           <div className="db-hero-glow" />
@@ -222,12 +299,19 @@ export default function Dashboard() {
 
             <div className="db-hero-meta">
               {user?.email && (
-                <span className="db-hero-meta-item"><HiOutlineMail size={14} /> {user.email}</span>
+                <span className="db-hero-meta-item">
+                  <HiOutlineMail size={14} /> {user.email}
+                </span>
               )}
               {user?.created_at && (
-                <span className="db-hero-meta-item"><HiOutlineCalendar size={14} /> Joined {formatDate(user.created_at)}</span>
+                <span className="db-hero-meta-item">
+                  <HiOutlineCalendar size={14} /> Joined{" "}
+                  {formatDate(user.created_at)}
+                </span>
               )}
-              <Link to="/settings" className="db-hero-link">Profile & Settings →</Link>
+              <Link to="/settings" className="db-hero-link">
+                Profile & Settings →
+              </Link>
             </div>
           </motion.div>
         </section>
@@ -237,7 +321,11 @@ export default function Dashboard() {
           <section className="db-stats-section">
             <div className="db-stats-grid">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="db-skeleton db-skeleton--stat" style={{ animationDelay: `${i * 0.15}s` }} />
+                <div
+                  key={i}
+                  className="db-skeleton db-skeleton--stat"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
               ))}
             </div>
           </section>
@@ -261,10 +349,16 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <section className="db-actions-section">
           <div className="db-actions-row">
-            <Link to="/wardrobe/new" className="db-action-btn db-action-btn-primary">
+            <Link
+              to="/wardrobe/new"
+              className="db-action-btn db-action-btn-primary"
+            >
               <HiOutlinePlus size={16} /> Upload Item
             </Link>
-            <Link to="/recommendations" className="db-action-btn db-action-btn-secondary">
+            <Link
+              to="/recommendations"
+              className="db-action-btn db-action-btn-secondary"
+            >
               <HiOutlineSparkles size={16} /> Get Recommendations
             </Link>
           </div>
@@ -278,24 +372,32 @@ export default function Dashboard() {
             </div>
             <div className="db-items-grid">
               {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="db-skeleton db-skeleton--card" style={{ animationDelay: `${i * 0.12}s` }} />
+                <div
+                  key={i}
+                  className="db-skeleton db-skeleton--card"
+                  style={{ animationDelay: `${i * 0.12}s` }}
+                />
               ))}
             </div>
           </section>
         ) : isEmpty ? (
           <section className="db-recent-section">
             <div className="db-empty">
-              <div className="db-empty-icon"><HiOutlineGlobeAlt size={40} /></div>
+              <div className="db-empty-icon">
+                <HiOutlineGlobeAlt size={40} />
+              </div>
               <h2 className="db-empty-h2">Get started!</h2>
               <p className="db-empty-body">
-                Build your digital wardrobe in three easy steps and unlock AI-powered outfit recommendations tailored just for you.
+                Build your digital wardrobe in three easy steps and unlock
+                AI-powered outfit recommendations tailored just for you.
               </p>
               <div className="db-checklist">
                 {ONBOARDING_STEPS.map((step, i) => (
                   <div key={i} className="db-checklist-item">
                     <span className="db-checklist-num">{i + 1}</span>
                     <span className="db-checklist-text">
-                      <strong>{step.bold}</strong>{step.rest}
+                      <strong>{step.bold}</strong>
+                      {step.rest}
                     </span>
                   </div>
                 ))}
@@ -306,7 +408,9 @@ export default function Dashboard() {
           <section className="db-recent-section">
             <div className="db-recent-header">
               <h2 className="db-recent-title">Recent Items</h2>
-              <span className="db-recent-count">{recentItems.length} of {stats.total}</span>
+              <span className="db-recent-count">
+                {recentItems.length} of {stats.total}
+              </span>
             </div>
             <div className="db-items-grid">
               {recentItems.map((item, i) => (

@@ -4,6 +4,7 @@ export type User = {
   _id: string;
   username: string;
   email: string;
+  provider: "local" | "google";
   is_active: boolean;
   created_at: string;
 };

@@ -1,3 +1,4 @@
+import json
 from beanie import PydanticObjectId
 from core.security import (
     create_access_token,
@@ -14,6 +15,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from models.Model import User, UserCreate, UserResponse, Provider
 from pydantic import BaseModel
+from db import setup_redis
 
 
 class GoogleAuthRequest(BaseModel):
@@ -32,6 +34,18 @@ class LoginRequestForm:
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+CURRENT_USER_CACHE_TTL_SECONDS = 120
+CURRENT_USER_CACHE_PREFIX = "auth:get_current_user:"
+
+
+async def invalidate_user_auth_cache(user_id: str | PydanticObjectId) -> None:
+    redis_client = setup_redis.redis_client
+    if redis_client is None:
+        return
+    try:
+        await redis_client.delete(f"{CURRENT_USER_CACHE_PREFIX}{user_id}")
+    except Exception:
+        pass
 
 
 # Dependency
@@ -60,9 +74,41 @@ async def get_current_user(
     user_id: str | None = payload.get("sub")
     if not user_id:
         raise credentials_exc
+
+    cache_key = f"{CURRENT_USER_CACHE_PREFIX}{user_id}"
+    redis_client = setup_redis.redis_client
+    if redis_client is not None:
+        try:
+            cached_user_raw = await redis_client.get(cache_key)
+            if cached_user_raw:
+                cached_user_data = json.loads(cached_user_raw)
+                cached_user = User.model_validate(cached_user_data)
+                if not cached_user.is_active:
+                    raise credentials_exc
+                await redis_client.expire(
+                    cache_key,
+                    CURRENT_USER_CACHE_TTL_SECONDS,
+                )
+                return cached_user
+        except Exception:
+            # Ignore cache failures and continue with DB lookup.
+            pass
+
     user = await User.get(PydanticObjectId(user_id))
     if user is None or not user.is_active:
         raise credentials_exc
+
+    if redis_client is not None:
+        try:
+            await redis_client.set(
+                cache_key,
+                user.model_dump_json(by_alias=True),
+                ex=CURRENT_USER_CACHE_TTL_SECONDS,
+            )
+        except Exception:
+            # Ignore cache write failures so auth flow remains available.
+            pass
+
     return user
 
 
@@ -147,6 +193,7 @@ async def login(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Account is disabled")
 
+    await invalidate_user_auth_cache(user.id)
     token = create_access_token(data={"sub": str(user.id)})
 
     # Cookie delivery (browser clients)
@@ -209,6 +256,7 @@ async def google_auth(body: GoogleAuthRequest, response: Response):
             user.provider = Provider.google
             user.hashed_password = None  # clear local password since Google is now the provider
             await user.save()
+            await invalidate_user_auth_cache(user.id)
     else:
         # New user from Google — generate a unique username
         import secrets

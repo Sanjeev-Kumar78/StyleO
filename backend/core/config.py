@@ -1,11 +1,9 @@
 import secrets
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
 class Settings(BaseSettings):
-    MONGO_URI: str = Field(
-        default="mongodb://localhost:27017")
     DATABASE_URL: str = Field(
         default="mongodb://localhost:27017/styleo")
     SECRET_KEY: str = Field(
@@ -17,10 +15,18 @@ class Settings(BaseSettings):
     REDIS_DB_URL: str = Field(default="redis://localhost:6379")
     COOKIE_SECURE: bool = Field(default=True)
 
-    model_config = {
-        "env_file": ".env",
-        "env_file_encoding": "utf-8",
-    }
+    # Gemini AI
+    GEMINI_API_KEY: str = Field(default="")
+
+    # Voyage AI Embedding API
+    VOYAGE_API_KEY: str = Field(default="")
+    VOYAGE_EMBEDDING_MODEL: str = Field(default="voyage-multimodal-3.5")
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="allow",
+    )
 
 
 settings = Settings()

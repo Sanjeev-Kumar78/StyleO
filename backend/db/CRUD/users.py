@@ -22,14 +22,12 @@ async def create_user(username: str, email: str, hashed_password: str) -> User:
     return user
 
 
-# check if email or username already exists — use count_documents with limit=1
-# to hit the index directly without fetching or discarding a full document
 async def is_email_taken(email: str) -> bool:
-    return await User.find(User.email == email.lower().strip()).count() > 0
+    return await User.find_one({"email": email.lower().strip()}) is not None
 
 
 async def is_username_taken(username: str) -> bool:
-    return await User.find(User.username == username.lower().strip()).count() > 0
+    return await User.find_one({"username": username.lower().strip()}) is not None
 
 
 async def get_user_by_email(email: str) -> User | None:
@@ -46,16 +44,14 @@ async def get_user_by_id(user_id: str) -> User | None:
     return await User.get(user_id)
 
 
-async def update_user_profile(user_email: str, profile_data: dict) -> Profile:
-    user = await get_user_by_email(user_email)
-    if not user:
-        raise ValueError("User not found")
-    # Profile is a separate document linked via user_id
-    profile = await Profile.find_one(Profile.user_id == user.id)
-    if not profile:
-        profile = Profile(user_id=user.id, **profile_data)
+async def update_user_profile(user_id: str, profile_data: dict) -> Profile:
+    profile = await Profile.find_one({"user_id": user_id})
+    if profile is None:
+        # Create new profile if it doesn't exist
+        profile = Profile(user_id=user_id, **profile_data)
         await profile.insert()
     else:
+        # Update existing profile
         for key, value in profile_data.items():
             setattr(profile, key, value)
         await profile.save()

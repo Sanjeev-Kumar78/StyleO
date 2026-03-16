@@ -14,7 +14,6 @@ import ContactPage from "./pages/ContactPage";
 import Dashboard from "./pages/Dashboard";
 import UploadItem from "./pages/UploadItem";
 import ProfilePage from "./pages/ProfilePage";
-import SettingsPage from "./pages/SettingsPage";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedNavBar from "./components/Protected_NavBar";
 import NavBar from "./components/NavBar";
@@ -32,7 +31,8 @@ const AppContent: React.FC = () => {
   const showNavBar = !["/login", "/signup"].includes(location.pathname);
   return (
     <>
-      {showNavBar && !loading && (user ? <ProtectedNavBar /> : <NavBar />)}
+      {showNavBar &&
+        (user ? <ProtectedNavBar /> : !loading ? <NavBar /> : null)}
 
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -44,9 +44,8 @@ const AppContent: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/wardrobe/new" element={<UploadItem />} />
-          <Route path="/wardrobe" element={<Wardrobe />} />
+          <Route path="/closet" element={<Wardrobe />} />
         </Route>
       </Routes>
     </>

@@ -28,7 +28,7 @@ def get_gridfs() -> AsyncGridFSBucket:
 async def close_db():
     global _client, _fs
     if _client is not None:
-        _client.close()
+        await _client.close()
         _client = None
         _fs = None
     print("Database connection closed")

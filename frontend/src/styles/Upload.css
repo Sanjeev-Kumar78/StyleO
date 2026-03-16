@@ -1,7 +1,9 @@
 @reference "tailwindcss";
 
 @keyframes uploadSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Page wrapper */
@@ -62,6 +64,27 @@
 
 .up-form {
   @apply flex flex-col gap-6;
+}
+
+.up-mode-tabs {
+  @apply grid rounded-xl border border-(--border-subtle) bg-(--surface-1);
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0.3rem;
+  gap: 0.3rem;
+}
+
+.up-mode-tab {
+  @apply rounded-lg border border-transparent bg-transparent text-(--text-dim) cursor-pointer font-(family-name:--font-body) transition-all duration-200;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.up-mode-tab:hover {
+  @apply text-(--text-primary) bg-(--bg-elevated);
+}
+
+.up-mode-tab--active {
+  @apply text-(--accent) border-(--accent-border) bg-(--accent-surface);
 }
 
 /* Side-by-side front/back image upload slots */
@@ -143,6 +166,45 @@
   font-size: 0.68rem;
 }
 
+.up-candidate-wrap {
+  @apply flex flex-col gap-3;
+}
+
+.up-candidate-title {
+  @apply m-0 text-(--text-dim) font-medium;
+  font-size: 0.8rem;
+}
+
+.up-candidate-grid {
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+
+.up-candidate-card {
+  @apply flex flex-col gap-2 rounded-xl border border-(--border) bg-(--surface-1) cursor-pointer transition-all duration-200;
+  padding: 0.5rem;
+}
+
+.up-candidate-card:hover {
+  @apply border-(--border-hi) -translate-y-0.5;
+}
+
+.up-candidate-card--active {
+  @apply border-(--accent-border) bg-(--accent-surface);
+  box-shadow: 0 0 0 1px var(--accent-border);
+}
+
+.up-candidate-image {
+  @apply rounded-lg object-contain bg-(--bg-elevated);
+  width: 100%;
+  height: 120px;
+}
+
+.up-candidate-label {
+  @apply text-(--text-primary) capitalize text-center;
+  font-size: 0.75rem;
+}
+
 /* AI Fill button */
 .up-ai-fill-btn {
   @apply inline-flex items-center justify-center gap-2 rounded-full cursor-pointer border border-(--accent-border) bg-(--accent-surface) text-(--accent) font-(family-name:--font-body) font-medium tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
@@ -169,6 +231,22 @@
   @apply flex items-center gap-2 rounded-lg bg-(--accent-surface) border border-(--accent-border) text-(--accent);
   padding: 0.6rem 1rem;
   font-size: 0.78rem;
+}
+
+/* AI description preview (read-only) */
+.up-ai-description {
+  @apply flex flex-col gap-1.5 rounded-lg bg-(--surface-1) border border-(--border-subtle);
+  padding: 0.85rem 1rem;
+}
+
+.up-ai-description .up-label {
+  @apply flex items-center gap-1.5 text-(--accent);
+  font-size: 0.72rem;
+}
+
+.up-ai-desc-text {
+  @apply text-(--text-dim) leading-relaxed m-0;
+  font-size: 0.82rem;
 }
 
 /* Form field layout */
@@ -240,7 +318,9 @@
 
 .up-submit:hover:not(:disabled) {
   @apply -translate-y-0.5;
-  box-shadow: 0 0 48px var(--accent-glow), 0 0 0 1px var(--accent-border);
+  box-shadow:
+    0 0 48px var(--accent-glow),
+    0 0 0 1px var(--accent-border);
 }
 
 /* Inline loading spinner */
@@ -360,5 +440,7 @@
 
 .up-confirm-submit:hover {
   @apply -translate-y-0.5;
-  box-shadow: 0 0 40px var(--accent-glow), 0 0 0 1px var(--accent-border);
+  box-shadow:
+    0 0 40px var(--accent-glow),
+    0 0 0 1px var(--accent-border);
 }
