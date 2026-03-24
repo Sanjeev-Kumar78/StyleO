@@ -1,4 +1,5 @@
 from pymongo.errors import DuplicateKeyError
+from beanie import PydanticObjectId
 from models import User, Profile
 
 
@@ -40,11 +41,11 @@ async def get_user_by_username(username: str) -> User | None:
     return await User.find_one({"username": username})
 
 
-async def get_user_by_id(user_id: str) -> User | None:
+async def get_user_by_id(user_id: str | PydanticObjectId) -> User | None:
     return await User.get(user_id)
 
 
-async def update_user_profile(user_id: str, profile_data: dict) -> Profile:
+async def update_user_profile(user_id: PydanticObjectId, profile_data: dict) -> Profile:
     profile = await Profile.find_one({"user_id": user_id})
     if profile is None:
         # Create new profile if it doesn't exist

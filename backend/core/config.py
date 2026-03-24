@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     VOYAGE_API_KEY: str = Field(default="")
     VOYAGE_EMBEDDING_MODEL: str = Field(default="voyage-multimodal-3.5")
 
+    # Background removal / ONNXRuntime
+    REMBG_ENABLE_GPU: bool = Field(default=False)
+
+    # Logging
+    LOG_LEVEL: str = Field(default="INFO")
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

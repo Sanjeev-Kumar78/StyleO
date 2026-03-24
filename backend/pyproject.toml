@@ -26,4 +26,5 @@ dependencies = [
     "uvicorn>=0.40.0",
     "rembg[gpu]>=2.0.73",
     "onnxruntime-gpu>=1.24.3",
+    "voyageai>=0.3.7",
 ]

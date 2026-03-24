@@ -1,10 +1,12 @@
+from google.genai.errors import APIError
 import base64
 import json
+from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, status
 from fastapi.responses import JSONResponse, Response
-from beanie import PydanticObjectId
 from fastapi_cache.decorator import cache
+from beanie import PydanticObjectId
 
 from models.Model import User, WardrobeItem, ClothingCategory, WardrobeIngestionMode
 from routes.auth import get_current_user
@@ -68,6 +70,28 @@ class AnalyzeMetadataRequest(BaseModel):
 
 class ProductLinkAnalyzeRequest(BaseModel):
     url: str
+
+
+class WardrobeListItemResponse(BaseModel):
+    id: str
+    category: Optional[ClothingCategory] = None
+    item_type: Optional[str] = None
+    color: Optional[str] = None
+    pattern: Optional[str] = None
+    season: Optional[str] = None
+    material: Optional[str] = None
+    front_image_id: Optional[str] = None
+    ai_description: Optional[str] = None
+    is_clean: bool
+    worn_count: int
+    created_at: datetime
+
+
+class WardrobePageResponse(BaseModel):
+    items: list[WardrobeListItemResponse]
+    has_more: bool
+    next_last_seen_created_at: Optional[datetime] = None
+    next_last_seen_id: Optional[str] = None
 
 
 async def _prepare_direct_images(
@@ -176,6 +200,11 @@ async def analyze_metadata(
         )
         metadata = _parse_ai_metadata(metadata_json_str)
         return {"metadata": metadata}
+    except APIError as api_exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Gemini API error: {api_exc}",
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -260,12 +289,89 @@ async def confirm_wardrobe_item(
 
 
 @wardrobe_router.get("/")
-@cache(expire=300)
-async def get_wardrobe_items(skip: int, limit: int, current_user: User = Depends(get_current_user)):
-    items = await WardrobeItem.find(WardrobeItem.user_id == current_user.id).skip(skip).limit(limit).to_list()
-    if items is None:
-        raise HTTPException(status_code=404, detail="No wardrobe items found")
-    return items
+@cache(expire=240, namespace="wardrobe_items")
+async def get_wardrobe_items(
+    last_seen_created_at: Optional[datetime] = Query(default=None),
+    last_seen_id: Optional[str] = Query(default=None),
+    limit: int = Query(default=20, ge=1),
+    current_user: User = Depends(get_current_user),
+):
+    match_filter: dict = {
+        "user_id": PydanticObjectId(str(current_user.id)),
+    }
+
+    if last_seen_created_at and last_seen_id:
+        try:
+            last_seen_object_id = PydanticObjectId(last_seen_id)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid last_seen_id")
+
+        match_filter["$or"] = [
+            {"created_at": {"$lt": last_seen_created_at}},
+            {
+                "created_at": last_seen_created_at,
+                "_id": {"$lt": last_seen_object_id},
+            },
+        ]
+    elif last_seen_created_at:
+        match_filter["created_at"] = {"$lt": last_seen_created_at}
+
+    pipeline = [
+        {"$sort": {"created_at": -1, "_id": -1}},
+        {"$limit": limit + 1},
+        {
+            "$project": {
+                "_id": {"$toString": "$_id"},
+                "category": 1,
+                "item_type": 1,
+                "color": 1,
+                "pattern": 1,
+                "season": 1,
+                "material": 1,
+                "front_image_id": 1,
+                "ai_description": 1,
+                "is_clean": 1,
+                "worn_count": 1,
+                "created_at": 1,
+            }
+        },
+    ]
+
+    raw_items = await WardrobeItem.find(match_filter).aggregate(pipeline).to_list()
+
+    has_more = len(raw_items) > limit
+    page_items_raw = raw_items[:limit]
+    page_items = [
+        WardrobeListItemResponse(
+            id=str(item["_id"]),
+            category=item.get("category"),
+            item_type=item.get("item_type"),
+            color=item.get("color"),
+            pattern=item.get("pattern"),
+            season=item.get("season"),
+            material=item.get("material"),
+            front_image_id=item.get("front_image_id"),
+            ai_description=item.get("ai_description"),
+            is_clean=item.get("is_clean", True),
+            worn_count=item.get("worn_count", 0),
+            created_at=item["created_at"],
+        )
+        for item in page_items_raw
+    ]
+
+    next_cursor_created_at: Optional[datetime] = None
+    next_cursor_id: Optional[str] = None
+    if has_more and page_items_raw:
+        last_item = page_items_raw[-1]
+        next_cursor_created_at = last_item["created_at"]
+        next_cursor_id = str(last_item["_id"])
+
+    return WardrobePageResponse(
+        items=page_items,
+        has_more=has_more,
+        next_last_seen_created_at=next_cursor_created_at,
+        next_last_seen_id=next_cursor_id,
+    )
 
 
 @wardrobe_router.get("/image/{image_id}")
@@ -309,3 +415,41 @@ async def delete_wardrobe_item(item_id: str, current_user: User = Depends(get_cu
 
     await item.delete()
     return {"message": "Item deleted successfully"}
+
+
+@wardrobe_router.post("/{item_id}/worn")
+async def mark_item_worn(item_id: str, current_user: User = Depends(get_current_user)):
+    try:
+        object_id = PydanticObjectId(item_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid item ID")
+
+    item = await WardrobeItem.get(object_id)
+    if not item or item.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    item.is_clean = False
+    item.worn_count += 1
+    if item.last_worn is None:
+        item.last_worn = []
+    item.last_worn.append(datetime.now(timezone.utc))
+    await item.save()
+
+    return {"message": "Item marked as worn", "is_clean": item.is_clean, "worn_count": item.worn_count}
+
+
+@wardrobe_router.post("/{item_id}/clean")
+async def mark_item_clean(item_id: str, current_user: User = Depends(get_current_user)):
+    try:
+        object_id = PydanticObjectId(item_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid item ID")
+
+    item = await WardrobeItem.get(object_id)
+    if not item or item.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    item.is_clean = True
+    await item.save()
+
+    return {"message": "Item marked as clean", "is_clean": item.is_clean}
