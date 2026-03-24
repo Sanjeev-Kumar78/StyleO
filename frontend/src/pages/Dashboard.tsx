@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import {
   HiOutlineHome,
   HiOutlineStar,
-  HiOutlineChartBar,
-  HiOutlineColorSwatch,
   HiOutlinePlus,
   HiOutlineSparkles,
   HiOutlineMail,
@@ -33,30 +31,6 @@ interface WardrobeItem {
   updated_at: string;
 }
 
-const COLOR_MAP: Record<string, string> = {
-  red: "#e74c3c",
-  blue: "#3498db",
-  green: "#2ecc71",
-  black: "#2c3e50",
-  white: "#ecf0f1",
-  navy: "#2c3e72",
-  grey: "#95a5a6",
-  gray: "#95a5a6",
-  brown: "#8b6914",
-  beige: "#d4c5a9",
-  pink: "#e91e8a",
-  purple: "#9b59b6",
-  yellow: "#f1c40f",
-  orange: "#e67e22",
-  cream: "#fffdd0",
-  maroon: "#800000",
-  olive: "#808000",
-  teal: "#008080",
-};
-
-const colorToCss = (c: string) =>
-  COLOR_MAP[c.toLowerCase().trim()] ?? "#8a8d95";
-
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", {
     month: "short",
@@ -69,8 +43,6 @@ const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const STATS_CONFIG = [
   { key: "total", icon: HiOutlineHome, label: "Total Items" },
   { key: "clean", icon: HiOutlineStar, label: "Clean Now" },
-  { key: "topType", icon: HiOutlineChartBar, label: "Most Worn Type" },
-  { key: "topColor", icon: HiOutlineColorSwatch, label: "Top Color" },
 ] as const;
 
 const ONBOARDING_STEPS = [
@@ -106,7 +78,7 @@ function StatCard({
       className="db-stat-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
     >
       <div className="db-stat-card-icon">
         <Icon size={20} />
@@ -138,11 +110,7 @@ function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
 
       {imageUrl ? (
         <div className="db-item-card-thumb">
-          <img
-            src={imageUrl}
-            alt={`${item.item_type} – ${item.color}`}
-            loading="lazy"
-          />
+          <img src={imageUrl} alt={`${item.item_type} – ${item.color}`} />
           {item.ai_description && (
             <div className="db-item-card-overlay">
               <p className="db-item-card-overlay-text">{item.ai_description}</p>
@@ -158,10 +126,6 @@ function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
       <div className="db-item-card-body">
         <p className="db-item-card-type">{item.item_type}</p>
         <div className="db-item-card-meta">
-          <span
-            className="db-item-card-color-dot"
-            style={{ background: colorToCss(item.color) }}
-          />
           <span className="db-item-card-color-label">{item.color}</span>
         </div>
       </div>
@@ -197,18 +161,7 @@ function useWardrobeData() {
     const total = items.length;
     const clean = items.filter((i) => i.is_clean).length;
 
-    const typeCount: Record<string, number> = {};
-    const colorCount: Record<string, number> = {};
-
-    for (const item of items) {
-      typeCount[item.item_type] = (typeCount[item.item_type] || 0) + 1;
-      colorCount[item.color] = (colorCount[item.color] || 0) + 1;
-    }
-
-    const topType = Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0];
-    const topColor = Object.entries(colorCount).sort((a, b) => b[1] - a[1])[0];
-
-    return { total, clean, topType, topColor };
+    return { total, clean };
   }, [items]);
 
   const recentItems = useMemo(
@@ -234,10 +187,6 @@ function getStatValue(
       return stats.total;
     case "clean":
       return stats.clean;
-    case "topType":
-      return stats.topType?.[0] ?? "—";
-    case "topColor":
-      return stats.topColor?.[0] ?? "—";
     default:
       return "—";
   }
@@ -252,10 +201,6 @@ function getStatAccent(
       return stats.total > 0
         ? `${Math.round((stats.clean / stats.total) * 100)}% ready`
         : undefined;
-    case "topType":
-      return stats.topType ? `${stats.topType[1]}× items` : undefined;
-    case "topColor":
-      return stats.topColor ? `${stats.topColor[1]}× items` : undefined;
     default:
       return undefined;
   }
@@ -320,7 +265,7 @@ export default function Dashboard() {
         {loading ? (
           <section className="db-stats-section">
             <div className="db-stats-grid">
-              {[0, 1, 2, 3].map((i) => (
+              {[0, 1].map((i) => (
                 <div
                   key={i}
                   className="db-skeleton db-skeleton--stat"
@@ -356,7 +301,7 @@ export default function Dashboard() {
               <HiOutlinePlus size={16} /> Upload Item
             </Link>
             <Link
-              to="/recommendations"
+              to="/outfits"
               className="db-action-btn db-action-btn-secondary"
             >
               <HiOutlineSparkles size={16} /> Get Recommendations
@@ -414,7 +359,11 @@ export default function Dashboard() {
             </div>
             <div className="db-items-grid">
               {recentItems.map((item, i) => (
-                <ItemCard key={item.id} item={item} delay={0.05 + i * 0.05} />
+                <ItemCard
+                  key={item.id ? `${item.id}-${i}` : `item-${i}`}
+                  item={item}
+                  delay={0.05 + i * 0.05}
+                />
               ))}
             </div>
           </section>

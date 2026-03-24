@@ -1,0 +1,237 @@
+@reference "tailwindcss";
+
+/* Root page layout */
+.pr-root {
+  @apply overflow-x-hidden bg-(--bg) min-h-screen transition-colors duration-350;
+  padding-top: clamp(4.5rem, 8vw, 5.5rem);
+}
+
+.pr-container {
+  @apply mx-auto;
+  max-width: 62rem;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+/* Full-page loading state */
+.pr-loading-screen {
+  @apply flex flex-col items-center justify-center gap-4 text-(--text-dim) min-h-[60vh];
+}
+
+.pr-spinner {
+  @apply w-10 h-10 rounded-full border-2 border-(--border-subtle) border-t-(--accent) animate-spin;
+}
+
+/* Onboarding welcome banner — only shown after fresh signup */
+.pr-onboarding-banner {
+  @apply flex items-start gap-4 p-5 rounded-2xl mb-6 border;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.pr-onboarding-icon {
+  @apply text-3xl shrink-0 mt-0.5;
+}
+
+.pr-onboarding-title {
+  @apply text-(--text-primary) font-semibold text-base mb-0.5;
+}
+
+.pr-onboarding-sub {
+  @apply text-(--text-dim) text-sm leading-relaxed;
+}
+
+/* Floating save success toast */
+.pr-toast {
+  @apply fixed top-20 right-5 z-50 flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-medium;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+/* User Header Card */
+.pr-header-card {
+  @apply relative overflow-hidden rounded-3xl bg-(--bg-elevated) border border-(--border-subtle) mb-8;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.pr-header-content {
+  @apply flex flex-col md:flex-row items-center gap-6 md:gap-10;
+}
+
+/* Avatar circle */
+.pr-avatar-wrap {
+  @apply relative shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-full bg-(--accent-dim) border-2 border-(--accent-border) flex items-center justify-center text-(--accent) text-4xl overflow-hidden shadow-lg select-none;
+}
+
+.pr-avatar-img {
+  @apply w-full h-full object-cover;
+}
+
+.pr-avatar-placeholder {
+  @apply text-(--accent) font-semibold;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* Camera icon overlay that appears in edit mode */
+.pr-avatar-overlay {
+  @apply absolute inset-0 flex items-center justify-center rounded-full opacity-0 transition-opacity duration-200;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.pr-avatar-wrap:hover .pr-avatar-overlay {
+  @apply opacity-100 text-white;
+}
+
+/* Staged avatar confirm row */
+.pr-avatar-confirm {
+  @apply flex flex-wrap items-center gap-3 mt-5 pt-4 border-t border-(--border-subtle) text-sm text-(--text-dim) overflow-hidden;
+}
+
+/* User info block */
+.pr-user-info {
+  @apply text-center md:text-left flex-1;
+}
+
+.pr-username {
+  @apply text-(--text-primary) font-(family-name:--font-display) font-light mb-1;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.pr-user-meta {
+  @apply flex flex-wrap justify-center md:justify-start gap-4 text-(--text-dim);
+  font-size: 0.85rem;
+}
+
+.pr-user-meta-item {
+  @apply flex items-center gap-1.5;
+}
+
+/* Header action buttons row */
+.pr-header-actions {
+  @apply flex gap-3 items-center flex-wrap shrink-0;
+}
+
+/* Error text inside header */
+.pr-error-text {
+  @apply mt-4 text-sm text-red-500;
+}
+
+/* Section wrapper */
+.pr-section {
+  @apply mb-10;
+}
+
+.pr-section-title {
+  @apply flex items-center gap-2 text-(--text-primary) font-(family-name:--font-display) font-light mb-6;
+  font-size: 1.5rem;
+}
+
+.pr-section-title svg {
+  @apply text-(--accent);
+}
+
+/* Two-column layout on md+ */
+.pr-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.pr-card {
+  @apply rounded-2xl bg-(--bg-elevated) border border-(--border-subtle) p-6;
+}
+
+/* Individual form field groups */
+.pr-form-group {
+  @apply flex flex-col gap-2 mb-6;
+}
+
+.pr-form-label {
+  @apply text-(--text-dim) text-[10px] uppercase tracking-widest font-semibold;
+}
+
+/* Static value display (non-editing) */
+.pr-field-value {
+  @apply text-(--text-primary) text-sm font-medium;
+}
+
+.pr-bio {
+  @apply text-(--text-dim) leading-relaxed;
+}
+
+/* Form inputs */
+.pr-input {
+  @apply w-full rounded-xl bg-(--surface-1) border border-(--border-subtle) px-4 py-3 text-(--text-primary) outline-none transition-all duration-200 focus:border-(--accent) focus:ring-2 focus:ring-(--accent-glow) text-sm;
+}
+
+.pr-textarea {
+  @apply min-h-28 resize-y;
+}
+
+.pr-input > option {
+  @apply bg-(--bg-elevated) text-(--text-primary);
+}
+
+/* Multi-select chip grid */
+.pr-chips {
+  @apply flex flex-wrap gap-2 mt-2;
+}
+
+.pr-chip {
+  @apply rounded-full bg-(--surface-1) text-(--text-dim) border border-(--border-subtle) font-medium transition-all duration-200 outline-none cursor-pointer;
+  padding: 0.4rem 1rem;
+  font-size: 0.78rem;
+}
+
+.pr-chip:hover {
+  @apply border-(--accent) text-(--accent) -translate-y-0.5;
+}
+
+/* Active/selected chip */
+.pr-chip--active {
+  @apply bg-(--accent) text-(--accent-text) border-(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+
+/* Empty state hint inside chip section */
+.pr-empty-hint {
+  @apply text-(--text-dim) text-sm italic;
+}
+
+/* Helper text shown below a free-text field */
+.pr-field-hint {
+  @apply text-(--text-dim) text-xs mt-1;
+}
+
+/* AI hint box at the bottom of Style DNA */
+.pr-ai-hint {
+  @apply p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mt-4 leading-relaxed;
+  font-size: 0.82rem;
+}
+
+/* Button variants */
+.pr-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full cursor-pointer px-6 py-2.5 font-medium transition-all duration-200 active:scale-95;
+  font-size: 0.88rem;
+}
+
+.pr-btn-sm {
+  @apply px-4 py-1.5;
+  font-size: 0.8rem;
+}
+
+.pr-btn-primary {
+  @apply bg-(--accent) text-(--accent-text) hover:-translate-y-0.5;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.pr-btn-outline {
+  @apply border border-(--border-subtle) text-(--text-dim) hover:border-(--accent) hover:text-(--accent);
+}
+
+.pr-btn-ghost {
+  @apply text-(--text-dim) hover:text-(--text-primary);
+}
+
+.pr-btn-danger {
+  @apply border border-(--danger-border) text-(--danger-text) bg-(--danger-bg) hover:bg-(--danger-text) hover:text-white;
+}

@@ -14,6 +14,7 @@ import ContactPage from "./pages/ContactPage";
 import Dashboard from "./pages/Dashboard";
 import UploadItem from "./pages/UploadItem";
 import ProfilePage from "./pages/ProfilePage";
+import Recommendations from "./pages/Recommendations";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedNavBar from "./components/Protected_NavBar";
 import NavBar from "./components/NavBar";
@@ -44,9 +45,11 @@ const AppContent: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/wardrobe/new" element={<UploadItem />} />
+          <Route path="/item/new" element={<UploadItem />} />
           <Route path="/closet" element={<Wardrobe />} />
+          <Route path="/outfits" element={<Recommendations />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </>
   );

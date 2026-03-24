@@ -1,0 +1,239 @@
+@reference "tailwindcss";
+
+@keyframes wrShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/*  Root & container  */
+.wr-root {
+  @apply overflow-x-hidden bg-(--bg) min-h-screen transition-colors duration-350 pt-[clamp(4.5rem,8vw,5.5rem)];
+}
+
+.wr-container {
+  @apply mx-auto max-w-[82rem] p-[clamp(1.5rem,3vw,2.25rem)_clamp(1.25rem,5vw,3.5rem)_clamp(2.5rem,5vw,4rem)];
+}
+
+/*  Back link  */
+.wr-back-top {
+  @apply inline-flex items-center gap-1.5 text-(--text-dim) no-underline font-medium
+         transition-colors duration-200 hover:text-(--accent) mb-6
+         font-(family-name:--font-body) text-[0.82rem];
+}
+
+/*  Page header  */
+.wr-header {
+  @apply mb-6;
+}
+
+.wr-eyebrow {
+  @apply flex items-center gap-3 mb-4;
+}
+
+.wr-eyebrow-line {
+  @apply shrink-0 h-px w-8 bg-(--accent);
+}
+
+.wr-eyebrow-text {
+  @apply uppercase text-(--accent) tracking-[0.2em] font-(family-name:--font-body) text-[0.7rem];
+}
+
+.wr-header-row {
+  @apply flex items-end justify-between gap-4 flex-wrap;
+}
+
+.wr-h1 {
+  @apply mb-2 text-(--text-primary) font-(family-name:--font-display) font-light leading-tight text-[clamp(1.9rem,3.8vw,3rem)];
+}
+
+.wr-h1 em {
+  @apply italic text-(--accent) font-light;
+}
+
+.wr-sub {
+  @apply text-(--text-dim) font-light leading-relaxed text-[0.9rem] max-w-[580px];
+}
+
+/*  Add Item button  */
+.wr-add-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full no-underline
+         bg-(--accent) text-(--accent-text) font-(family-name:--font-body) font-medium
+         transition-all duration-200 py-3 px-[1.2rem] text-[0.82rem] shadow-[0_0_24px_var(--accent-glow)];
+}
+
+.wr-add-btn:hover {
+  @apply -translate-y-0.5 shadow-[0_0_36px_var(--accent-glow)];
+}
+
+/*  Stats strip  */
+.wr-stats {
+  @apply flex flex-wrap gap-2 mb-6 py-3 px-4 bg-(--surface-1) border border-(--border-subtle) rounded-[1rem];
+}
+
+.wr-chip {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-(--accent-border)
+         bg-(--accent-surface) text-(--accent) font-(family-name:--font-body) font-medium py-[0.32rem] px-[0.7rem] text-[0.72rem];
+}
+
+/*  Item grid  */
+.wr-grid {
+  @apply grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-[clamp(0.8rem,1.4vw,1.15rem)];
+}
+
+/*  Wardrobe Card  */
+.wr-card {
+  @apply relative overflow-hidden rounded-2xl bg-(--card-bg) border border-(--border)
+         transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_28px_var(--shadow-heavy)];
+}
+
+/* Reveal actions on hover */
+.wr-card-actions {
+  @apply flex items-center justify-between mt-2 opacity-0 pointer-events-none transition-opacity duration-200 gap-2;
+}
+.wr-card:hover .wr-card-actions,
+.wr-card:focus-within .wr-card-actions {
+  @apply opacity-100 pointer-events-auto;
+}
+
+/*  Card image  */
+.wr-thumb {
+  @apply flex items-center justify-center overflow-hidden bg-(--surface-1) h-[190px] relative;
+}
+
+.wr-thumb::after {
+  content: "";
+  @apply absolute inset-x-0 bottom-0 h-[40px] bg-[linear-gradient(to_top,var(--card-bg,transparent),transparent)] pointer-events-none;
+}
+
+.wr-thumb img {
+  @apply w-full h-full object-scale-down;
+}
+
+.wr-thumb--placeholder {
+  @apply text-(--text-dim);
+}
+
+/*  Clean / Used badge  */
+.wr-badge {
+  @apply absolute top-2 right-2 z-10 rounded-full border
+         font-(family-name:--font-body) font-medium tracking-wide text-[0.62rem] py-[0.14rem] px-[0.52rem];
+}
+
+.wr-badge--clean {
+  @apply bg-(--accent-badge-bg) text-(--accent) border-(--accent-badge-border);
+}
+
+.wr-badge--used {
+  @apply bg-(--warn-badge-bg) text-(--warn) border-(--warn-badge-border);
+}
+
+/*  Card body  */
+.wr-card-body {
+  @apply flex flex-col gap-2 p-[0.85rem];
+}
+
+.wr-type {
+  @apply text-(--text-primary) font-(family-name:--font-body) font-medium
+         leading-tight capitalize text-[0.92rem];
+}
+
+.wr-meta {
+  @apply text-(--text-dim) leading-tight font-(family-name:--font-body) text-[0.72rem];
+}
+
+/*  Tags row (pattern / season / material)  */
+.wr-tags {
+  @apply flex flex-wrap gap-1.5;
+}
+
+.wr-tag {
+  @apply rounded-full border border-(--border-subtle) bg-(--surface-1) text-(--text-dim)
+         font-(family-name:--font-body) text-[0.64rem] py-[0.14rem] px-2;
+}
+
+/*  AI description  */
+.wr-desc {
+  @apply text-(--text-dim) leading-relaxed font-(family-name:--font-body) text-[0.72rem] overflow-hidden line-clamp-2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+/*  Toggle button  */
+.wr-toggle-btn {
+  @apply inline-flex justify-center items-center gap-1.5 rounded-full
+         border border-(--border-subtle) bg-(--bg-elevated) text-(--text-primary)
+         font-(family-name:--font-body) font-medium transition-all duration-200 py-[0.38rem] px-[0.72rem] text-[0.68rem] flex-1;
+}
+
+.wr-toggle-btn:hover:not(:disabled) {
+  @apply bg-(--surface-2) border-(--border-hi);
+}
+
+/*  Delete button  */
+.wr-delete-btn {
+  @apply inline-flex justify-center items-center gap-1.5 rounded-full
+         border border-(--danger-border) bg-(--danger-bg) text-(--danger-text)
+         font-(family-name:--font-body) font-medium transition-all duration-200 py-[0.38rem] px-[0.72rem] text-[0.68rem] flex-1;
+}
+
+.wr-delete-btn:hover:not(:disabled) {
+  @apply border-(--border-hi) bg-(--danger-bg) brightness-[1.15];
+}
+
+.wr-delete-btn:disabled {
+  @apply opacity-70 cursor-not-allowed;
+}
+
+/*  Empty state  */
+.wr-empty {
+  @apply rounded-2xl border border-(--border-subtle) bg-(--bg-elevated) text-center p-[clamp(1.75rem,4vw,2.5rem)];
+}
+
+.wr-empty-icon {
+  @apply inline-flex items-center justify-center rounded-full bg-(--accent-surface)
+         text-(--accent) border border-(--accent-border) mb-3 w-[58px] h-[58px];
+}
+
+.wr-empty-h2 {
+  @apply text-(--text-primary) font-(family-name:--font-display) font-light mb-2 text-[1.6rem];
+}
+
+.wr-empty-text {
+  @apply text-(--text-dim) font-(family-name:--font-body) mx-auto mb-4 text-[0.85rem] max-w-[440px];
+}
+
+.wr-empty-cta {
+  @apply inline-flex items-center justify-center rounded-full no-underline
+         border border-(--accent-border) bg-(--accent-surface) text-(--accent)
+         font-(family-name:--font-body) font-medium transition-all duration-200 py-[0.62rem] px-[1.1rem] text-[0.78rem];
+}
+
+.wr-empty-cta:hover {
+  @apply bg-(--accent-dim) -translate-y-0.5 shadow-[0_4px_20px_var(--accent-glow)];
+}
+
+/*  Error banner  */
+.wr-error {
+  @apply rounded-lg border bg-(--danger-bg) border-(--danger-border) text-(--danger-text)
+         font-(family-name:--font-body) mb-4 py-[0.72rem] px-[0.95rem] text-[0.82rem];
+}
+
+/*  Skeleton loader  */
+.wr-skeleton {
+  @apply rounded-2xl border border-(--border-subtle) h-[300px] bg-[size:400%_100%] animate-[wrShimmer_1.2s_ease-in-out_infinite];
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-1) 25%,
+    var(--surface-2) 37%,
+    var(--surface-1) 63%
+  );
+}
+
+/*  Load-more  */
+.wr-loading-more {
+  @apply flex justify-center mt-6;
+}

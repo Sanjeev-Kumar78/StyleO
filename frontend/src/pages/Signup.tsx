@@ -83,7 +83,9 @@ const Signup: React.FC = () => {
         email: data.email,
         password: data.password,
       });
-      navigate("/dashboard", { replace: true });
+      // Send new users straight to profile setup so they fill in their Style DNA
+      // before hitting the dashboard. The onboarding=true flag shows a welcome banner.
+      navigate("/profile?onboarding=true", { replace: true });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const data = error.response.data;

@@ -117,13 +117,26 @@ function extractErrorDetail(error: unknown): string | undefined {
   if (typeof error !== "object" || error === null) return undefined;
   if (!("response" in error)) return undefined;
 
-  const response = (error as { response?: { data?: { detail?: unknown } } })
-    .response;
+  const response = (
+    error as {
+      response?: {
+        data?: { detail?: unknown; message?: unknown; error?: unknown };
+      };
+      message?: unknown;
+    }
+  ).response;
+
   const detail = response?.data?.detail;
-  return typeof detail === "string" ? detail : undefined;
+  if (typeof detail === "string") return detail;
+
+  const message = response?.data?.message;
+  if (typeof message === "string") return message;
+
+  const fallback = (error as { message?: unknown }).message;
+  return typeof fallback === "string" ? fallback : undefined;
 }
 
-/* ── Main component ───────────────────────────────────────────────────── */
+/*  Main component  */
 
 export default function UploadItem() {
   const navigate = useNavigate();

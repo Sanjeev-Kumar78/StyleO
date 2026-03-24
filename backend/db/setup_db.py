@@ -2,7 +2,8 @@ from pymongo import AsyncMongoClient
 from gridfs.asynchronous import AsyncGridFSBucket
 from beanie import init_beanie
 from core.config import settings
-from models import User, Profile, Outfit, WardrobeItem, StyleRecommendation
+from models import User, Profile, WardrobeItem
+# from models import Outfit, StyleRecommendation
 
 _client: AsyncMongoClient | None = None
 _fs: AsyncGridFSBucket | None = None
@@ -12,7 +13,8 @@ async def init_db():
     global _client, _fs
     _client = AsyncMongoClient(settings.DATABASE_URL)
     db = _client["styleo_db"]
-    await init_beanie(database=db, document_models=[User, Profile, Outfit, WardrobeItem, StyleRecommendation])
+    # await init_beanie(database=db, document_models=[User, Profile, Outfit, WardrobeItem, StyleRecommendation])
+    await init_beanie(database=db, document_models=[User, Profile, WardrobeItem])
     _fs = AsyncGridFSBucket(db, bucket_name="images")
     print("Database initialized successfully")
 

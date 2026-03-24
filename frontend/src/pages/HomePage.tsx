@@ -791,7 +791,7 @@ const HomePage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* ─ Right: Jacket visual ─ */}
+          {/*  Right: Jacket visual  */}
           <motion.div
             className="hp-hero-jacket-col"
             style={{ translateY: jacketY }}
