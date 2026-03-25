@@ -120,7 +120,7 @@ User Interface Layer (React/TypeScript)
 Service  CRUD Service Services
     |    |    |    |
     |    |----|----|
-    |         |
+    |    |    |
   Database  Cache
   (MongoDB) (Redis)
 ```
