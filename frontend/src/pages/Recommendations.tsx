@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../services/api";
+import api, { BACKEND_BASE_URL } from "../services/api";
 
 /*  Types  */
 interface OutfitItem {
@@ -18,9 +18,6 @@ interface OutfitRecommendation {
   items: OutfitItem[];
   reason: string;
 }
-
-/*  Constants  */
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -460,7 +457,6 @@ export default function Recommendations() {
                   key={idx}
                   outfit={outfit}
                   index={idx}
-                  apiBase={API_BASE}
                 />
               ))}
             </motion.div>
@@ -482,11 +478,9 @@ export default function Recommendations() {
 function OutfitCard({
   outfit,
   index,
-  apiBase,
 }: {
   outfit: OutfitRecommendation;
   index: number;
-  apiBase: string;
 }) {
   return (
     <motion.div
@@ -596,7 +590,7 @@ function OutfitCard({
         }}
       >
         {outfit.items.map((item) => (
-          <ItemThumb key={item._id} item={item} apiBase={apiBase} />
+          <ItemThumb key={item._id} item={item} />
         ))}
       </div>
     </motion.div>
@@ -604,10 +598,10 @@ function OutfitCard({
 }
 
 /*  Item Thumbnail  */
-function ItemThumb({ item, apiBase }: { item: OutfitItem; apiBase: string }) {
+function ItemThumb({ item }: { item: OutfitItem }) {
   const [imgError, setImgError] = useState(false);
   const imgSrc = item.front_image_id
-    ? `${apiBase}/wardrobe/image/${item.front_image_id}`
+    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
     : null;
 
   return (

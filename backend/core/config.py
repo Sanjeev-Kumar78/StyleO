@@ -4,6 +4,7 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
+    FRONTEND_URL: str = Field(default="http://localhost:5173")
     DATABASE_URL: str = Field(
         default="mongodb://localhost:27017/styleo")
     SECRET_KEY: str = Field(

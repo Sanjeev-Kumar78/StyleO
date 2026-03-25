@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
+import { BACKEND_BASE_URL } from "../services/api";
 
 const routesPaths = [
   "/user",
@@ -12,7 +12,7 @@ const routesPaths = [
 // Callback to create an object with keys as route names and values as full URLs
 const exportedRoutes: Record<string, string> = routesPaths.reduce(
   (acc: Record<string, string>, path: string) => {
-    const base = String(API_BASE_URL).replace(/\/$/, "");
+    const base = String(BACKEND_BASE_URL).replace(/\/$/, "");
     acc[path.slice(1)] = `${base}${path}`;
     return acc;
   },

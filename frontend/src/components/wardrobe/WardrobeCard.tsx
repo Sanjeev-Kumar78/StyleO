@@ -5,6 +5,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineClock,
 } from "react-icons/hi";
+import { BACKEND_BASE_URL } from "../../services/api";
 
 export interface WardrobeCardItem {
   id: string;
@@ -27,8 +28,6 @@ interface WardrobeCardProps {
   deleting: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-
 const toTitle = (value?: string) => {
   if (!value) return "—";
   return value
@@ -44,7 +43,7 @@ export default function WardrobeCard({
   deleting,
 }: WardrobeCardProps) {
   const imageUrl = item.front_image_id
-    ? `${API_BASE}/wardrobe/image/${item.front_image_id}`
+    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
     : null;
 
   const tags = [item.pattern, item.season, item.material].filter(Boolean);

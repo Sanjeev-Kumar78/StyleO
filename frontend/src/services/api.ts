@@ -5,7 +5,7 @@ import axios from "axios";
  *
  * - `withCredentials` ensures the httpOnly JWT cookie is sent automatically.
  * - Uses relative paths in dev (Vite proxy forwards to FastAPI).
- * - In production, set VITE_API_BASE_URL to your API origin.
+ * - In production, set VITE_BACKEND_URL to your API origin.
  */
 const resolvedBaseUrl = import.meta.env.VITE_BACKEND_URL || "";
 
@@ -13,6 +13,7 @@ export const BACKEND_BASE_URL = String(resolvedBaseUrl).replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
+  timeout: 15000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

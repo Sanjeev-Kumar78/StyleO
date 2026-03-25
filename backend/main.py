@@ -12,6 +12,7 @@ from routes.recommend import recommend_router
 from routes.auth import get_current_user
 from workers.main import broker
 from core.logging_config import configure_logging
+from core.config import settings
 
 
 configure_logging()
@@ -53,7 +54,8 @@ app.add_middleware(
     CORSMiddleware,
     # update for production
     allow_origins=["http://localhost:5173",
-                   "https://cindi-earthquaked-dictatorially.ngrok-free.dev"],
+                   "https://cindi-earthquaked-dictatorially.ngrok-free.dev",
+                   settings.FRONTEND_URL],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,

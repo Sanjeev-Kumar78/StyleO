@@ -12,7 +12,7 @@ import {
   HiOutlinePhotograph,
 } from "react-icons/hi";
 import { useAuth } from "../hooks/useAuth";
-import api from "../services/api";
+import api, { BACKEND_BASE_URL } from "../services/api";
 import "../styles/Dashboard.css";
 
 interface WardrobeItem {
@@ -78,7 +78,7 @@ function StatCard({
       className="db-stat-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 0.5, delay, ease: EASE_OUT_EXPO }}
     >
       <div className="db-stat-card-icon">
         <Icon size={20} />
@@ -92,7 +92,7 @@ function StatCard({
 
 function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
   const imageUrl = item.front_image_id
-    ? `/wardrobe/image/${item.front_image_id}`
+    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
     : null;
 
   return (
