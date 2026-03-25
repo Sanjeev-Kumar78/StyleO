@@ -1,4 +1,30 @@
 services:
+  backend:
+    build: ./backend
+    container_name: styleo-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - backend/.env
+    command: >
+      uvicorn main:app --host 0.0.0.0 --port 8080
+    depends_on:
+      - redis
+    networks:
+      - styleo-net
+
+  worker:
+    build: ./backend
+    container_name: styleo-worker
+    env_file:
+      - backend/.env
+    command: >
+      taskiq worker worker.main:broker
+    depends_on:
+      - redis
+    networks:
+      - styleo-net
+
   redis:
     image: redis:latest
     container_name: styleo-redis
@@ -16,13 +42,12 @@ services:
       - redis_data:/data
     networks:
       - styleo-net
+
   redis-insight:
     image: redis/redisinsight:latest
     container_name: styleo-redis-insight
     ports:
       - "5540:5540"
-    env_file:
-      - backend/.env
     depends_on:
       - redis
     volumes:

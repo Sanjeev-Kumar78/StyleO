@@ -52,10 +52,10 @@ app = FastAPI(title="StyleO API", lifespan=lifespan,
 # Middleware
 app.add_middleware(
     CORSMiddleware,
-    # update for production
-    allow_origins=["http://localhost:5173",
-                   "https://cindi-earthquaked-dictatorially.ngrok-free.dev",
-                   settings.FRONTEND_URL],
+    allow_origins=[
+        "http://localhost:5173",
+        settings.FRONTEND_URL,
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,

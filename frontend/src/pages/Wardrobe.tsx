@@ -318,7 +318,7 @@ export default function Wardrobe() {
             </p>
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as "all" | "clean" | "used")}
               className="px-3 py-1.5 rounded-full border border-(--border-subtle) bg-(--surface-1) text-(--text-primary) text-[0.8rem] outline-none cursor-pointer hover:border-(--border-hi) transition-colors"
             >
               <option value="all">All States</option>
