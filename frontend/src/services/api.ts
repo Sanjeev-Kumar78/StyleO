@@ -15,6 +15,8 @@ const api = axios.create({
   baseURL: BACKEND_BASE_URL,
   timeout: 200000,
   withCredentials: true,
+  // TEMPORARY: To accept the self-signed certificate in development.
+  validateStatus: () => true,
   headers: {
     "Content-Type": "application/json",
   },
