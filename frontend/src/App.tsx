@@ -6,6 +6,7 @@ import {
   useLocation,
   BrowserRouter,
 } from "react-router";
+import { Analytics } from "@vercel/analytics/react";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import AboutPage from "./pages/AboutPage";
@@ -59,6 +60,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AppContent />
+      <Analytics />
     </BrowserRouter>
   );
 };
