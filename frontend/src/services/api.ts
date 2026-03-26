@@ -13,7 +13,7 @@ export const BACKEND_BASE_URL = String(resolvedBaseUrl).replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
