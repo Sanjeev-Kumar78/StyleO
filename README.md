@@ -7,6 +7,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-2ea44f)](https://github.com/Sanjeev-Kumar78/StyleO)
 
+> [!WARNING]
+> Frontend is currently under development and hosted on Vercel, but it is not yet linked to the backend API.
+> Some app flows may be unavailable until backend integration is completed.
+
 StyleO is a personalized digital wardrobe management system that combines artificial intelligence with wardrobe tracking to deliver smart outfit recommendations. The platform tracks clothing inventory, maintains the state of garments (clean, dirty, worn), and uses machine learning to generate contextual outfit suggestions based on user preferences and availability.
 
 ## Overview
