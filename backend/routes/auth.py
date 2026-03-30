@@ -159,7 +159,7 @@ async def register(body: UserCreate, response: Response):
         value=token,
         httponly=True,
         secure=settings.COOKIE_SECURE,
-        samesite="lax",
+        samesite="none",
         max_age=60 * 60 * 24,
     )
     # Header delivery (API / mobile clients)
@@ -202,7 +202,7 @@ async def login(
         value=token,
         httponly=True,
         secure=settings.COOKIE_SECURE,
-        samesite="lax",
+        samesite="none",
         max_age=60 * 60 * 24,
     )
     # Header delivery (API / mobile clients)
@@ -287,7 +287,7 @@ async def google_auth(body: GoogleAuthRequest, response: Response):
         value=token,
         httponly=True,
         secure=settings.COOKIE_SECURE,
-        samesite="lax",
+        samesite="none",
         max_age=60 * 60 * 24,
     )
     return {"access_token": token, "token_type": "bearer"}
