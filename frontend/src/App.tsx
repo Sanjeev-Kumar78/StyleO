@@ -19,21 +19,27 @@ import { useAuth } from "./hooks/useAuth";
 import ProtectedNavBar from "./components/Protected_NavBar";
 import NavBar from "./components/NavBar";
 import Wardrobe from "./pages/Wardrobe";
+import { getAccessToken } from "./services/api";
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
   if (loading) return null;
-  return user ? <Outlet /> : <Navigate to="/login" replace={true} />;
+  return user || getAccessToken() ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" replace={true} />
+  );
 }
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const isAuthenticated = Boolean(user || getAccessToken());
   const showNavBar = !["/login", "/signup"].includes(location.pathname);
   return (
     <>
       {showNavBar &&
-        (user ? <ProtectedNavBar /> : !loading ? <NavBar /> : null)}
+        (isAuthenticated ? <ProtectedNavBar /> : !loading ? <NavBar /> : null)}
 
       <Routes>
         <Route path="/login" element={<Login />} />

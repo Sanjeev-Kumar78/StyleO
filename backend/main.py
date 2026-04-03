@@ -1,4 +1,5 @@
 import logging
+import re
 from fastapi import FastAPI, Request, Depends
 from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
@@ -54,12 +55,19 @@ frontend_origin = str(settings.FRONTEND_URL).strip()
 if frontend_origin:
     allowed_origins.append(frontend_origin)
 
+cors_origin_regex = (
+    r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+    r"|^https://.*\.execute-api\.[a-z0-9-]+\.amazonaws\.com$"
+    r"|^https://.*\.cloudfront\.net$"
+)
+
 # Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
+    allow_headers=["*"],
     allow_credentials=True,
     expose_headers=["Set-Cookie"],
 )
