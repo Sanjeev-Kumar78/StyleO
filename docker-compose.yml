@@ -51,6 +51,8 @@ services:
     networks:
       - styleo-net
     restart: unless-stopped
+    volumes:
+      - rembg-cache:/root/.u2net
 
   worker:
     build: ./backend
@@ -97,7 +99,8 @@ services:
   #     - styleo-net
   #   restart: unless-stopped
 
-# volumes:
+volumes:
+  rembg-cache:
 #   redis_data:
 #   redis_insight_data:
 

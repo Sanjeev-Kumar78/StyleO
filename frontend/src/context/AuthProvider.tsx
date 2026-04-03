@@ -1,5 +1,6 @@
 import api, { clearAccessToken, setAccessToken } from "../services/api";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   AuthContext,
   type User,
@@ -20,8 +21,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await api.get(`${authUrl}/me`);
       setUser(response.data);
-    } catch {
-      clearAccessToken();
+    } catch (error) {
+      const statusCode = axios.isAxiosError(error)
+        ? error.response?.status
+        : undefined;
+
+      // Only clear auth state for real auth failures.
+      // Network/gateway errors should not drop a valid in-memory/session token.
+      if (statusCode === 401 || statusCode === 403) {
+        clearAccessToken();
+      }
       setUser(null);
     } finally {
       setLoading(false);
