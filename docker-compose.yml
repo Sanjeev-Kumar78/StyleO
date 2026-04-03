@@ -58,7 +58,7 @@ services:
     env_file:
       - backend/.env
     command: >
-      uv sync && uv run taskiq worker workers.main:broker
+      uv run taskiq worker workers.main:broker
     # depends_on:
     #   - redis
     networks:
