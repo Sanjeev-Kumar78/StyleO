@@ -55,10 +55,12 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         settings.FRONTEND_URL,
+        # settings.API_GATEWAY_URL,
     ],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
+    expose_headers=["Set-Cookie"],
 )
 
 
@@ -76,7 +78,6 @@ app.include_router(user_router, dependencies=[Depends(get_current_user)])
 app.include_router(wardrobe_router, dependencies=[Depends(get_current_user)])
 app.include_router(recommend_router, dependencies=[Depends(get_current_user)])
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
-
 
 
 @app.get("/health")
