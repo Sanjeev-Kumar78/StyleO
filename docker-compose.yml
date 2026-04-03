@@ -33,7 +33,7 @@ services:
       - ./certs:/etc/nginx/certs:ro
     depends_on:
       - backend
-      - frontend
+      # - frontend
     networks:
       - styleo-net
     restart: unless-stopped
@@ -46,8 +46,8 @@ services:
       - backend/.env
     command: >
       uv run uvicorn main:app --host 0.0.0.0 --port 8080
-    depends_on:
-      - redis
+    # depends_on:
+    #   - redis
     networks:
       - styleo-net
     restart: unless-stopped
@@ -59,8 +59,8 @@ services:
       - backend/.env
     command: >
       uv sync && uv run taskiq worker workers.main:broker
-    depends_on:
-      - redis
+    # depends_on:
+    #   - redis
     networks:
       - styleo-net
     restart: unless-stopped
