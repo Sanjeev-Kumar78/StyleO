@@ -49,16 +49,17 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="StyleO API", lifespan=lifespan,
               description="API for StyleO", version="1.0.0")
 
+allowed_origins = ["http://localhost:5173"]
+frontend_origin = str(settings.FRONTEND_URL).strip()
+if frontend_origin:
+    allowed_origins.append(frontend_origin)
+
 # Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        settings.FRONTEND_URL,
-        # settings.API_GATEWAY_URL,
-    ],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=allowed_origins,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
     allow_credentials=True,
     expose_headers=["Set-Cookie"],
 )
@@ -68,6 +69,10 @@ app.add_middleware(
 async def add_coop_header(request: Request, call_next):
     response = await call_next(request)
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     return response
 
 

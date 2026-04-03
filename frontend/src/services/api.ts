@@ -1,5 +1,70 @@
 import axios from "axios";
 
+const ACCESS_TOKEN_STORAGE_KEY = "styleo_access_token";
+let inMemoryAccessToken: string | null = null;
+
+const isJwtLike = (token: string): boolean => {
+  // Basic structural validation to avoid persisting malformed token values.
+  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token);
+};
+
+export const getAccessToken = (): string | null => {
+  if (inMemoryAccessToken) {
+    return inMemoryAccessToken;
+  }
+
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedToken = window.sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+    if (storedToken) {
+      if (!isJwtLike(storedToken)) {
+        window.sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+        return null;
+      }
+      inMemoryAccessToken = storedToken;
+    }
+    return storedToken;
+  } catch {
+    return null;
+  }
+};
+
+export const setAccessToken = (token: string): void => {
+  if (!isJwtLike(token)) {
+    return;
+  }
+
+  inMemoryAccessToken = token;
+
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    // sessionStorage limits token lifetime to the browser tab/session.
+    window.sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+  } catch {
+    // Ignore storage failures (private mode, blocked storage, etc.)
+  }
+};
+
+export const clearAccessToken = (): void => {
+  inMemoryAccessToken = null;
+
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    // Ignore storage failures.
+  }
+};
+
 /**
  * Centralised Axios instance for all backend API calls.
  *
@@ -22,6 +87,11 @@ const api = axios.create({
 
 // Request interceptor to override timeout for different route types
 api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token && !config.headers?.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   // Auth check route needs fast timeout to avoid blocking UI
   const isAuthRoute = config.url?.includes("/auth/me");
 
@@ -42,5 +112,15 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      clearAccessToken();
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default api;

@@ -38,6 +38,19 @@ CURRENT_USER_CACHE_TTL_SECONDS = 120
 CURRENT_USER_CACHE_PREFIX = "auth:get_current_user:"
 
 
+def set_auth_cookie(response: Response, token: str) -> None:
+    """Set auth cookie with consistent security attributes."""
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=settings.COOKIE_SECURE,
+        samesite="none",
+        max_age=60 * 60 * 24,
+        path="/",
+    )
+
+
 async def invalidate_user_auth_cache(user_id: str | PydanticObjectId) -> None:
     redis_client = setup_redis.redis_client
     if redis_client is None:
@@ -66,10 +79,7 @@ async def get_current_user(
     # Try cookie first, then Bearer header
     jwt_token = request.cookies.get("access_token") or token
     if not jwt_token:
-        # Try header
-        jwt_token = request.headers.get("access_token")
-        if not jwt_token:
-            raise credentials_exc
+        raise credentials_exc
     payload = verify_access_token(jwt_token)
     user_id: str | None = payload.get("sub")
     if not user_id:
@@ -154,14 +164,7 @@ async def register(body: UserCreate, response: Response):
     # Set the cookie or return the token as needed
     token = create_access_token(data={"sub": str(user.id)})
     # Cookie delivery (browser clients)
-    response.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        secure=settings.COOKIE_SECURE,
-        samesite="none",
-        max_age=60 * 60 * 24,
-    )
+    set_auth_cookie(response, token)
     # Header delivery (API / mobile clients)
     return {"access_token": token, "token_type": "bearer"}
 
@@ -197,14 +200,7 @@ async def login(
     token = create_access_token(data={"sub": str(user.id)})
 
     # Cookie delivery (browser clients)
-    response.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        secure=settings.COOKIE_SECURE,
-        samesite="none",
-        max_age=60 * 60 * 24,
-    )
+    set_auth_cookie(response, token)
     # Header delivery (API / mobile clients)
     return {"access_token": token, "token_type": "bearer"}
 
@@ -212,7 +208,12 @@ async def login(
 @auth_router.post("/logout")
 async def logout(response: Response):
     """Clear the auth cookie (browser logout)."""
-    response.delete_cookie(key="access_token")
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        secure=settings.COOKIE_SECURE,
+        samesite="none",
+    )
     return {"message": "Logged out successfully"}
 
 
@@ -282,14 +283,7 @@ async def google_auth(body: GoogleAuthRequest, response: Response):
         )
 
     token = create_access_token(data={"sub": str(user.id)})
-    response.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        secure=settings.COOKIE_SECURE,
-        samesite="none",
-        max_age=60 * 60 * 24,
-    )
+    set_auth_cookie(response, token)
     return {"access_token": token, "token_type": "bearer"}
 
 

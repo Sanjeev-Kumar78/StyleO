@@ -1,4 +1,4 @@
-import api from "../services/api";
+import api, { clearAccessToken, setAccessToken } from "../services/api";
 import React, { useEffect, useState } from "react";
 import {
   AuthContext,
@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await api.get(`${authUrl}/me`);
       setUser(response.data);
     } catch {
+      clearAccessToken();
       setUser(null);
     } finally {
       setLoading(false);
@@ -40,7 +41,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const response = await api.post(`${authUrl}/login`, formData, {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
-    // Cookie is set automatically by the browser (httponly)
+    const token = response.data?.access_token;
+    if (typeof token === "string" && token.length > 0) {
+      setAccessToken(token);
+    }
+
+    // Cookie is set automatically by the browser (httponly) when allowed.
     // Also fetch user data after login
     if (response.data) {
       await refreshUser();
@@ -49,13 +55,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signup = async (data: SignupData) => {
     const response = await api.post(`${authUrl}/register`, data);
+    const token = response.data?.access_token;
+    if (typeof token === "string" && token.length > 0) {
+      setAccessToken(token);
+    }
+
     if (response.data) {
       await refreshUser();
     }
   };
 
   const googleLogin = async (credential: string) => {
-    await api.post(`${authUrl}/google`, { credential });
+    const response = await api.post(`${authUrl}/google`, { credential });
+    const token = response.data?.access_token;
+    if (typeof token === "string" && token.length > 0) {
+      setAccessToken(token);
+    }
+
     await refreshUser();
   };
 
@@ -63,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await api.post(`${authUrl}/logout`);
     } finally {
+      clearAccessToken();
       setUser(null);
       window.location.assign("/login");
     }
