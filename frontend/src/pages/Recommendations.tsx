@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import api, { BACKEND_BASE_URL } from "../services/api";
+import useAuthenticatedImage from "../hooks/useAuthenticatedImage";
+import api from "../services/api";
 
 /*  Types  */
 interface OutfitItem {
@@ -600,9 +601,7 @@ function OutfitCard({
 /*  Item Thumbnail  */
 function ItemThumb({ item }: { item: OutfitItem }) {
   const [imgError, setImgError] = useState(false);
-  const imgSrc = item.front_image_id
-    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
-    : null;
+  const { imageUrl: imgSrc } = useAuthenticatedImage(item.front_image_id);
 
   return (
     <div

@@ -5,7 +5,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineClock,
 } from "react-icons/hi";
-import { BACKEND_BASE_URL } from "../../services/api";
+import useAuthenticatedImage from "../../hooks/useAuthenticatedImage";
 
 export interface WardrobeCardItem {
   id: string;
@@ -42,9 +42,7 @@ export default function WardrobeCard({
   onToggleClean,
   deleting,
 }: WardrobeCardProps) {
-  const imageUrl = item.front_image_id
-    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
-    : null;
+  const { imageUrl } = useAuthenticatedImage(item.front_image_id);
 
   const tags = [item.pattern, item.season, item.material].filter(Boolean);
 

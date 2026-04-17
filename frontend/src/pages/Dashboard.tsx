@@ -12,7 +12,8 @@ import {
   HiOutlinePhotograph,
 } from "react-icons/hi";
 import { useAuth } from "../hooks/useAuth";
-import api, { BACKEND_BASE_URL } from "../services/api";
+import useAuthenticatedImage from "../hooks/useAuthenticatedImage";
+import api from "../services/api";
 import "../styles/Dashboard.css";
 
 interface WardrobeItem {
@@ -91,9 +92,7 @@ function StatCard({
 }
 
 function ItemCard({ item, delay }: { item: WardrobeItem; delay: number }) {
-  const imageUrl = item.front_image_id
-    ? `${BACKEND_BASE_URL}/wardrobe/image/${item.front_image_id}`
-    : null;
+  const { imageUrl } = useAuthenticatedImage(item.front_image_id);
 
   return (
     <motion.div
