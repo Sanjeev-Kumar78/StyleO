@@ -41,8 +41,6 @@ services:
   backend:
     build: ./backend
     container_name: styleo-backend
-    expose:
-      - "8080"
     # Backend only accessible via nginx (internal network)
     env_file:
       - backend/.env
@@ -62,7 +60,7 @@ services:
     env_file:
       - backend/.env
     command: >
-      uv run taskiq worker workers.main:broker
+      uv run taskiq worker workers.main:broker --workers 1
     # depends_on:
     #   - redis
     networks:
