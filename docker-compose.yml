@@ -67,24 +67,24 @@ services:
       - styleo-net
     restart: unless-stopped
 
-  # redis:
-  #   image: redis:latest
-  #   container_name: styleo-redis
-  #   ports:
-  #     - "6379:6379"
-  #   env_file:
-  #     - backend/.env
-  #   command: >
-  #     sh -c 'if [ -n "$$REDIS_PASSWORD" ]; then
-  #              exec redis-server --appendonly no --requirepass "$$REDIS_PASSWORD"
-  #            else
-  #              exec redis-server --appendonly no
-  #            fi'
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - styleo-net
-  #   restart: unless-stopped
+  redis:
+    image: redis:latest
+    container_name: styleo-redis
+    ports:
+      - "6379:6379"
+    env_file:
+      - backend/.env
+    command: >
+      sh -c 'if [ -n "$$REDIS_PASSWORD" ]; then
+               exec redis-server --appendonly no --requirepass "$$REDIS_PASSWORD"
+             else
+               exec redis-server --appendonly no
+             fi'
+    volumes:
+      - redis_data:/data
+    networks:
+      - styleo-net
+    restart: unless-stopped
 
   # redis-insight:
   #   image: redis/redisinsight:latest
@@ -101,7 +101,7 @@ services:
 
 volumes:
   rembg-cache:
-#   redis_data:
+  redis_data:
 #   redis_insight_data:
 
 networks:
