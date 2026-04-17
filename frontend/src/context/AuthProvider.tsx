@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (credentials: LoginCredentials) => {
     const formData = new URLSearchParams();
-    formData.append("email", credentials.email);
+    formData.append("username", credentials.email); // OAuth2 spec uses 'username' field
     formData.append("password", credentials.password);
 
     const response = await api.post(`${authUrl}/login`, formData, {

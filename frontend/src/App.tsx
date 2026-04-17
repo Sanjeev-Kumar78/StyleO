@@ -20,6 +20,7 @@ import ProtectedNavBar from "./components/Protected_NavBar";
 import NavBar from "./components/NavBar";
 import Wardrobe from "./pages/Wardrobe";
 import { getAccessToken } from "./services/api";
+import { Analytics } from "@vercel/analytics/react";
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -65,6 +66,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AppContent />
+      <Analytics />
     </BrowserRouter>
   );
 };

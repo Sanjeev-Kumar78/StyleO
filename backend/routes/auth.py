@@ -9,8 +9,8 @@ from core.security import (
 )
 from db.CRUD import create_user, is_email_taken, is_username_taken
 from core.config import settings
-from fastapi import APIRouter, Request, Response, HTTPException, Depends, status, Form
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import APIRouter, Request, Response, HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from models.Model import User, UserCreate, UserResponse, Provider
@@ -20,16 +20,6 @@ from db import setup_redis
 
 class GoogleAuthRequest(BaseModel):
     credential: str
-
-
-class LoginRequestForm:
-    def __init__(
-        self,
-        email: str = Form(),
-        password: str = Form(),
-    ):
-        self.email = email
-        self.password = password
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -171,19 +161,23 @@ async def register(body: UserCreate, response: Response):
 
 @auth_router.post("/login")
 async def login(
-    response: Response,
-    form_data: LoginRequestForm = Depends(),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    response: Response = None,
 ):
     """
-    Authenticate with e-mail) + password
+    Authenticate with email + password (OAuth2 compliant)
+
+    Accepts application/x-www-form-urlencoded data with:
+    - username: user's email address
+    - password: user's password
 
     Returns a signed JWT as both:
-    - a JSON body
-    ```{"access_token": "...", "token_type": "bearer"}``` 
-    (for API / mobile clients), and
-    - an `httponly` cookie (for browser clients).
+    - a JSON body ```{"access_token": "...", "token_type": "bearer"}```
+      (for API / mobile clients), and
+    - an httponly cookie (for browser clients).
     """
-    user = await User.find_one(User.email == form_data.email)
+    # OAuth2 spec uses 'username' field, but we use it for email
+    user = await User.find_one(User.email == form_data.username)
     if user is None or user.hashed_password is None or not verify_password(
         form_data.password, user.hashed_password.get_secret_value()
     ):
