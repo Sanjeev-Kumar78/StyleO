@@ -1,0 +1,262 @@
+@reference "tailwindcss";
+.contact-page-wrapper {
+  @apply min-h-screen flex items-center justify-center pt-28 pb-16 px-4 sm:px-8;
+  background-color: transparent; /* inherits from body */
+  font-family: var(--font-body);
+}
+
+.contact-container {
+  @apply max-w-5xl w-full mx-auto flex flex-col gap-10 lg:gap-14;
+  animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contact-header {
+  @apply text-center max-w-2xl mx-auto;
+}
+
+.section-title {
+  @apply text-4xl sm:text-5xl font-extrabold mb-4 tracking-tight;
+  /* Use system text colors, no hardcoded gradient */
+  color: var(--text-primary);
+  font-family: var(--font-display);
+}
+
+.section-description {
+  @apply text-lg sm:text-xl;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* Card Layout */
+.contact-card-container {
+  @apply flex flex-col md:flex-row rounded-3xl md:rounded-4xl overflow-hidden;
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px var(--shadow-heavy);
+  backdrop-filter: blur(12px);
+}
+
+/* Left Panel - Info */
+.contact-info-panel {
+  @apply relative p-10 md:p-12 overflow-hidden flex flex-col shrink-0 w-full md:w-[320px] lg:w-[380px];
+  background: var(--surface-2);
+  border-right: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.contact-info-content {
+  @apply relative z-10 h-full flex flex-col items-center justify-center text-center;
+}
+
+.contact-info-content h3 {
+  @apply text-2xl font-bold mb-4 mt-auto;
+}
+
+.contact-info-content p {
+  @apply text-base mb-8;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* Ambient glow blobs to replace hardcoded circles */
+.circle-decor {
+  @apply absolute rounded-full blur-[60px] pointer-events-none;
+  z-index: 0;
+}
+
+.circle-1 {
+  @apply w-[250px] h-[250px] -bottom-[100px] -right-[100px];
+  background: var(--accent-glow);
+  animation: float 8s ease-in-out infinite;
+}
+
+.circle-2 {
+  @apply w-[200px] h-[200px] -top-[50px] -left-[50px];
+  background: var(--warn-glow);
+  opacity: 0.6;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-20px, -20px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Social Buttons */
+.social-links-area {
+  @apply mt-auto w-full flex justify-center;
+}
+
+.social-buttons-grid {
+  @apply flex gap-4 flex-wrap justify-center;
+}
+
+.social-btn {
+  @apply flex items-center justify-center w-12 h-12 rounded-full text-xl transition-all duration-300;
+  background: var(--surface-3);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.social-btn:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 20px var(--accent-glow);
+  border-color: var(--accent-border);
+}
+
+/* Right Panel - Form */
+.contact-form-panel {
+  @apply flex-1 p-8 sm:p-12 md:p-14 lg:p-16 flex flex-col justify-center;
+  background: transparent;
+}
+
+.notification-area {
+  @apply min-h-[50px] mb-6;
+}
+
+.submission-message, .error-message {
+  @apply px-5 py-4 rounded-xl text-[0.95rem] font-medium flex items-center;
+  animation: slideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.submission-message {
+  background: var(--check-bg);
+  color: var(--check-color);
+}
+
+.error-message {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.contact-form {
+  @apply flex flex-col gap-8;
+}
+
+.row-group {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-8;
+}
+
+.input-container {
+  @apply relative flex flex-col gap-2;
+}
+
+.input-container label {
+  @apply text-[0.8rem] font-bold uppercase tracking-wider transition-colors duration-300;
+  color: var(--muted);
+}
+
+.input-container input,
+.input-container textarea {
+  @apply w-full bg-transparent border-0 border-b-2 py-3 text-base leading-relaxed outline-none transition-all duration-300 resize-y;
+  border-bottom-color: var(--border-hi);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.input-container input::placeholder,
+.input-container textarea::placeholder {
+  color: var(--text-dim);
+  opacity: 0.5;
+}
+
+.input-container textarea {
+  @apply min-h-[120px];
+}
+
+/* Focus effects */
+.focus-border {
+  @apply absolute bottom-0 left-0 w-0 h-[2px] transition-all duration-300;
+  background: var(--accent);
+}
+
+.input-container input:focus ~ .focus-border,
+.input-container textarea:focus ~ .focus-border {
+  @apply w-full;
+}
+
+.input-container input:focus + label,
+.input-container textarea:focus ~ label,
+.input-container input:-webkit-autofill + label,
+.input-container textarea:-webkit-autofill + label {
+  color: var(--accent);
+}
+
+/* Auto-fill fix for dark/light themes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-action {
+  @apply mt-4 flex justify-end;
+}
+
+.submit-button {
+  @apply relative overflow-hidden py-3.5 px-10 rounded-full text-base font-semibold transition-all duration-300;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+.submit-button:hover:not(:disabled) {
+  @apply -translate-y-0.5;
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.submit-button:active:not(:disabled) {
+  @apply translate-y-px;
+}
+
+/* Button shine effect */
+.btn-hover-fx {
+  @apply absolute top-0 -left-full w-full h-full transition-all duration-500 ease-out;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+}
+
+.submit-button:hover .btn-hover-fx {
+  @apply left-full;
+}
+
+.submit-button.loading {
+  @apply opacity-75 cursor-not-allowed;
+}
+
+@media (max-width: 768px) {
+  .contact-info-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .form-action {
+    @apply justify-stretch;
+  }
+  .submit-button {
+    @apply w-full;
+  }
+}
