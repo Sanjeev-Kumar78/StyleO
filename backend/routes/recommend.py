@@ -7,7 +7,11 @@ from pydantic import BaseModel, Field
 
 from models.Model import User, WardrobeItem, ClothingCategory, Profile
 from routes.auth import get_current_user
-from services.ai_service import get_voyage_query_embedding, get_gemini_outfit_recommendations
+from services.ai_service import (
+    GeminiServiceError,
+    get_gemini_outfit_recommendations,
+    get_voyage_query_embedding,
+)
 from beanie import PydanticObjectId
 
 recommend_router = APIRouter(prefix="/recommend", tags=["Recommendation"])
@@ -327,6 +331,10 @@ async def recommend_outfits(
             favorite_colors=favorite_colors,
         )
         gemini_outfits = json.loads(response_json).get("outfits") or []
+    except GeminiServiceError as e:
+        raise HTTPException(
+            status_code=502, detail=f"Outfit generation failed: {e}"
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Outfit generation failed: {e}"

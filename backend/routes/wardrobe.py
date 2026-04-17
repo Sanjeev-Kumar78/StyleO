@@ -1,4 +1,3 @@
-from google.genai.errors import APIError
 import base64
 import json
 from datetime import datetime, timezone
@@ -11,7 +10,7 @@ from beanie import PydanticObjectId
 from models.Model import User, WardrobeItem, ClothingCategory, WardrobeIngestionMode
 from routes.auth import get_current_user
 from services.image_service import preprocess_image, save_image, fetch_image, delete_image
-from services.ai_service import generate_wardrobe_ai_description
+from services.ai_service import GeminiServiceError, generate_wardrobe_ai_description
 from services.bg_removal import remove_background_generic, extract_outfit_candidates
 from workers.tasks import generate_and_store_embedding
 from pydantic import BaseModel
@@ -200,10 +199,10 @@ async def analyze_metadata(
         )
         metadata = _parse_ai_metadata(metadata_json_str)
         return {"metadata": metadata}
-    except APIError as api_exc:
+    except GeminiServiceError as gemini_exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Gemini API error: {api_exc}",
+            detail=str(gemini_exc),
         )
     except HTTPException:
         raise

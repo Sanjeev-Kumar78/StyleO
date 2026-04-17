@@ -15,6 +15,10 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 
+class GeminiServiceError(RuntimeError):
+    """Raised when the upstream Gemini service returns an error."""
+
+
 # Lazy Gemini client
 _gemini_client: genai.Client | None = None
 
@@ -159,7 +163,7 @@ async def generate_wardrobe_ai_description(
         logger.info("%s", parsed)
     except APIError as api_exc:
         logger.error("Gemini API error: %s", api_exc)
-        raise RuntimeError(f"Gemini API error: {api_exc}") from api_exc
+        raise GeminiServiceError(f"Gemini API error: {api_exc}") from api_exc
     except json.JSONDecodeError as json_exc:
         logger.error("[gemini] JSON decode error: %s", json_exc)
         if response_text:
@@ -334,7 +338,7 @@ async def get_gemini_outfit_recommendations(
         )
     except APIError as api_exc:
         logger.error("Gemini API error: %s", api_exc)
-        raise RuntimeError(f"Gemini API error: {api_exc}") from api_exc
+        raise GeminiServiceError(f"Gemini API error: {api_exc}") from api_exc
     except Exception as exc:
         logger.error("[gemini] Unexpected error: %s", exc)
         raise RuntimeError(f"Unexpected Gemini error: {exc}") from exc
