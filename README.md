@@ -158,22 +158,10 @@ The following features are currently available in the application:
 ## Architecture Overview
 
 The application follows a three-tier architecture pattern:
+<img width="1708" height="1425" alt="diagram-export-4-18-2026-10_09_36-PM" src="https://github.com/user-attachments/assets/67b56559-43bd-4533-8eea-2c1512e24d05" />
 
-```
-User Interface Layer (React/TypeScript)
-         |
-         | HTTP/REST API
-         |
-    Backend Services
-    |    |    |    |
- Auth  User  AI   Image
-Service  CRUD Service Services
-    |    |    |    |
-    |    |----|----|
-    |    |    |
-  Database  Cache
-  (MongoDB) (Redis)
-```
+
+
 
 The backend processes requests asynchronously for I/O-bound operations and dispatches heavy computational tasks (image processing, AI analysis) to background workers via the Taskiq queue.
 
