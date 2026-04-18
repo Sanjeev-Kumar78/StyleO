@@ -17,11 +17,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Mask AWS Role Name
+        run: |
+          # Extract the role name from the IAM ARN and tell GitHub Actions to mask it
+          ROLE_ARN="${{ secrets.AWS_ROLE_ARN }}"
+          ROLE_NAME=$(echo "$ROLE_ARN" | awk -F/ '{print $NF}')
+          echo "::add-mask::$ROLE_NAME"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: true
 
       - name: Start EC2 if stopped
         run: |
@@ -32,7 +40,7 @@ jobs:
           if [ "$STATE" = "stopped" ]; then
             aws ec2 start-instances --instance-ids "${{ secrets.EC2_INSTANCE_ID }}"
             aws ec2 wait instance-running --instance-ids "${{ secrets.EC2_INSTANCE_ID }}"
-            sleep 30
+            sleep 10
           fi
 
       - name: Deploy to EC2 using SSM
@@ -43,7 +51,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "StyleO Deployment" \
             --parameters commands="[
-              \"su - ec2-user -c 'cd styleo && ./deploy'\"
+              \"sudo -i -u ec2-user bash -c 'cd ~/styleo && ./deploy'\"
             ]" \
             --query 'Command.CommandId' \
             --output text)
