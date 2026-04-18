@@ -51,7 +51,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "StyleO Deployment" \
             --parameters commands="[
-              \"sudo -i -u ec2-user bash -c 'cd ~/styleo && ./deploy'\"
+              \"sudo -i -u ec2-user bash -c 'cd ~/styleo && ./deploy.sh'\"
             ]" \
             --query 'Command.CommandId' \
             --output text)
