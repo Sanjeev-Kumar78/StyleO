@@ -6,12 +6,58 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9%2B-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-2ea44f)](https://github.com/Sanjeev-Kumar78/StyleO)
+[![Backend Status](https://img.shields.io/endpoint?url=https%3A%2F%2F9qk1chspm2.execute-api.us-east-2.amazonaws.com%2Fprod%2Fstatus&cacheSeconds=60&logo=amazonec2&logoColor=white)](https://9qk1chspm2.execute-api.us-east-2.amazonaws.com/prod/wake)
 
 > [!WARNING]
-> Frontend is currently under development and hosted on Vercel, but it is not yet linked to the backend API.
-> Some app flows may be unavailable until backend integration is completed.
+> The backend EC2 instance runs **on-demand** to save cost. It automatically starts when the frontend first makes a request and **shuts down after 30 minutes of inactivity**.
+> **Expect a ~60–90 second cold-start delay** on first use after a period of inactivity. The badge above shows live backend status.
 
 StyleO is a personalized digital wardrobe management system that combines artificial intelligence with wardrobe tracking to deliver smart outfit recommendations. The platform tracks clothing inventory, maintains the state of garments (clean, dirty, worn), and uses machine learning to generate contextual outfit suggestions based on user preferences and availability.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Roadmap](#roadmap)
+- [Features](#features)
+  - [Authentication & User Management](#authentication--user-management)
+  - [Wardrobe Management](#wardrobe-management)
+  - [Image Processing & Upload](#image-processing--upload)
+  - [AI Services](#ai-services)
+  - [Recommendation Engine](#recommendation-engine)
+- [Technology Stack](#technology-stack)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Infrastructure](#infrastructure)
+- [Architecture Overview](#architecture-overview)
+- [Prerequisites](#prerequisites)
+  - [System Requirements](#system-requirements)
+  - [Required External Services](#required-external-services)
+- [Installation](#installation)
+  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  - [Step 2: Backend Setup](#step-2-backend-setup)
+  - [Step 3: Frontend Setup](#step-3-frontend-setup)
+  - [Step 4: Start Services with Docker Compose](#step-4-start-services-with-docker-compose)
+- [Development Workflow](#development-workflow)
+  - [Starting the Backend Server](#starting-the-backend-server)
+  - [Starting the Frontend Development Server](#starting-the-frontend-development-server)
+  - [Running Background Workers](#running-background-workers)
+- [Configuration Details](#configuration-details)
+  - [Database Setup](#database-setup)
+  - [Redis Caching](#redis-caching)
+  - [Google OAuth Configuration](#google-oauth-configuration)
+  - [Gemini AI Setup](#gemini-ai-setup)
+  - [Voyage AI Setup](#voyage-ai-setup)
+- [Project Structure](#project-structure)
+- [Application Flow](#application-flow)
+- [API Documentation](#api-documentation)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Production Considerations](#production-considerations)
+- [License](#license)
+- [Support](#support)
+- [Acknowledgments](#acknowledgments)
+
+
 
 ## Overview
 
@@ -192,11 +238,19 @@ source .venv/bin/activate
 
 #### 2.4 Install Python Dependencies
 
+The project is managed with [uv](https://github.com/astral-sh/uv). Install it first if you don't have it:
+
 ```bash
-pip install -e .
+pip install uv
 ```
 
-This installs all dependencies listed in `pyproject.toml`, including FastAPI, Beanie, Redis client, and AI/ML libraries.
+Then sync all dependencies from the lockfile:
+
+```bash
+uv sync
+```
+
+This installs all dependencies listed in `pyproject.toml` into the `.venv` created by uv, including FastAPI, Beanie, Redis client, and AI/ML libraries.
 
 #### 2.5 Environment Configuration
 
@@ -210,7 +264,7 @@ DATABASE_URL=mongodb://localhost:27017/styleo
 SECRET_KEY=your-generated-secret-key-here
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-COOKIE_SECURE=true
+COOKIE_SECURE=false
 
 # Redis Configuration
 REDIS_DB_URL=redis://localhost:6379
@@ -265,42 +319,49 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
 
 ### Step 4: Start Services with Docker Compose
 
-From the project root, start MongoDB and Redis:
+For local development, use `docker-compose.local.yml` from the project root:
 
 ```bash
-docker-compose up -d
+docker-compose -f docker-compose.local.yml up -d
 ```
 
 This starts:
 
-- MongoDB on port 27017
 - Redis on port 6379
-- Redis Insight on port 5540 (UI for Redis management)
+- Redis Insight on port 5540 (UI for Redis monitoring)
+- Backend API on port 8080 (via Nginx proxy)
+- Taskiq worker process
+
+> **Note:** MongoDB is **not** started by Docker Compose. Run a local MongoDB instance or provide a remote connection string (e.g., MongoDB Atlas) via `DATABASE_URL` in `backend/.env`.
 
 Verify services are running:
 
 ```bash
-docker-compose ps
+docker-compose -f docker-compose.local.yml ps
 ```
 
 ## Development Workflow
 
 ### Starting the Backend Server
 
-Navigate to the `backend` directory with the virtual environment activated:
+Navigate to the `backend` directory with the virtual environment activated and run via `uv`:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+cd backend
+uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-The API will be available at `http://localhost:8000`
+The API will be available at `http://localhost:8000`  
 API documentation available at `http://localhost:8000/docs` (Swagger UI)
+
+> **Note:** Do **not** pass `--workers` when using `--reload`. The `--workers` flag is for production only (see `docker-compose.yml`).
 
 ### Starting the Frontend Development Server
 
 Navigate to the `frontend` directory:
 
 ```bash
+cd frontend
 npm run dev
 ```
 
@@ -308,14 +369,14 @@ The application will be available at `http://localhost:5173`
 
 ### Running Background Workers
 
-In a separate terminal, start the Taskiq worker process:
+In a separate terminal from the `backend` directory, start the Taskiq worker process:
 
 ```bash
 cd backend
-taskiq worker workers.main:broker
+uv run taskiq worker workers.main:broker --workers 1
 ```
 
-This process handles asynchronous tasks like image processing and AI analysis.
+This process handles asynchronous tasks like embedding generation and AI analysis. Keep it running alongside the backend server.
 
 ## Configuration Details
 

@@ -21,6 +21,7 @@ import NavBar from "./components/NavBar";
 import Wardrobe from "./pages/Wardrobe";
 import { getAccessToken } from "./services/api";
 import { Analytics } from "@vercel/analytics/react";
+import useBackendWake from "./hooks/useBackendWake";
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -37,6 +38,11 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const isAuthenticated = Boolean(user || getAccessToken());
   const showNavBar = !["/login", "/signup"].includes(location.pathname);
+
+  // Silently wake the backend EC2 instance on every page load.
+  // If the instance is stopped, the Lambda starts it and we retry
+  // using the Retry-After header until it is running.
+  useBackendWake();
   return (
     <>
       {showNavBar &&

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import api from "../services/api";
+import imageQueue from "../services/imageQueue";
 
 type ImageState = {
   imageId?: string;
@@ -34,8 +35,11 @@ export default function useAuthenticatedImage(
       return;
     }
 
-    api
-      .get(`/wardrobe/image/${imageId}`, { responseType: "blob" })
+    // Throttle concurrent image fetches via a shared queue
+    imageQueue
+      .enqueue(() =>
+        api.get(`/wardrobe/image/${imageId}`, { responseType: "blob" }),
+      )
       .then((response) => {
         if (cancelled) return;
         objectUrl = URL.createObjectURL(response.data);
