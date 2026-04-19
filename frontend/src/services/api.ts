@@ -92,21 +92,21 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  const url = config.url || "";
+
   // Auth check route needs fast timeout to avoid blocking UI
   const isAuthRoute = config.url?.includes("/auth/me");
 
-  // Routes that depend on AI processing need longer timeouts
-  const aiDependentRoutes = ["/recommend", "/outfit", "/wardrobe/analyze"];
-
-  const isAiRoute = aiDependentRoutes.some((route) =>
-    config.url?.includes(route),
-  );
+  // Routes that depend on heavy AI processing need significantly longer timeouts
+  // We check for keywords to be more robust against slash variations
+  const aiKeywords = ["recommend", "outfit", "analyze", "generate"];
+  const isAiRoute = aiKeywords.some((keyword) => url.toLowerCase().includes(keyword));
 
   if (isAuthRoute) {
-    // 5 seconds for auth check - fail fast to show navbar
+    // 5 seconds for auth check
     config.timeout = 5000;
   } else if (isAiRoute) {
-    // 5 minutes for AI processing
+    // 5 minutes for AI processing (Gemini + Vector Search takes time)
     config.timeout = 300000;
   }
 
