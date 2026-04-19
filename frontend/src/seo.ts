@@ -11,7 +11,7 @@ type SeoMetadata = {
 };
 
 export const SITE_URL = "https://styleo.vercel.app";
-const DEFAULT_IMAGE_URL = `${SITE_URL}/favicon_StyleO.png`;
+const DEFAULT_IMAGE_URL = `${SITE_URL}/live_preview.png`;
 
 const DEFAULT_DESCRIPTION =
   "StyleO helps you digitize your wardrobe, track garment lifecycle, and get AI-powered outfit recommendations based on what you actually own.";
@@ -196,7 +196,7 @@ export function applySeo(pathname: string) {
   }).setAttribute("content", DEFAULT_IMAGE_URL);
   ensureMeta('meta[name="twitter:card"]', {
     name: "twitter:card",
-  }).setAttribute("content", "summary");
+  }).setAttribute("content", "summary_large_image");
   ensureMeta('meta[name="twitter:title"]', {
     name: "twitter:title",
   }).setAttribute("content", metadata.title);
