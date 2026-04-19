@@ -78,7 +78,7 @@ export const BACKEND_BASE_URL = String(resolvedBaseUrl).replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
-  timeout: 7000, // Default: 7 seconds for standard routes
+  timeout: 60000, // Default: 60 seconds for standard routes
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
