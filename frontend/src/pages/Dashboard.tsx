@@ -294,7 +294,7 @@ export default function Dashboard() {
         <section className="db-actions-section">
           <div className="db-actions-row">
             <Link
-              to="/wardrobe/new"
+              to="/item/new"
               className="db-action-btn db-action-btn-primary"
             >
               <HiOutlinePlus size={16} /> Upload Item
