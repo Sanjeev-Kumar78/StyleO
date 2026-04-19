@@ -78,7 +78,7 @@ export const BACKEND_BASE_URL = String(resolvedBaseUrl).replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
-  timeout: 7000, // Default: 15 seconds for most routes
+  timeout: 7000, // Default: 7 seconds for standard routes
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -96,7 +96,7 @@ api.interceptors.request.use((config) => {
   const isAuthRoute = config.url?.includes("/auth/me");
 
   // Routes that depend on AI processing need longer timeouts
-  const aiDependentRoutes = ["/recommendation", "/outfit", "/wardrobe/analyze"];
+  const aiDependentRoutes = ["/recommend", "/outfit", "/wardrobe/analyze"];
 
   const isAiRoute = aiDependentRoutes.some((route) =>
     config.url?.includes(route),
