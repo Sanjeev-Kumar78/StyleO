@@ -12,6 +12,7 @@ from services.ai_service import (
     get_gemini_outfit_recommendations,
     get_voyage_query_embedding,
 )
+from fastapi_cache.decorator import cache
 from beanie import PydanticObjectId
 
 recommend_router = APIRouter(prefix="/recommend", tags=["Recommendation"])
