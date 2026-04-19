@@ -22,6 +22,8 @@ import Wardrobe from "./pages/Wardrobe";
 import { getAccessToken } from "./services/api";
 import { Analytics } from "@vercel/analytics/react";
 import useBackendWake from "./hooks/useBackendWake";
+import { useEffect } from "react";
+import { applySeo } from "./seo";
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -43,6 +45,11 @@ const AppContent: React.FC = () => {
   // If the instance is stopped, the Lambda starts it and we retry
   // using the Retry-After header until it is running.
   useBackendWake();
+
+  useEffect(() => {
+    applySeo(location.pathname);
+  }, [location.pathname]);
+
   return (
     <>
       {showNavBar &&

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /item/
+Disallow: /closet
+Disallow: /outfits
+
+Sitemap: https://styleo.vercel.app/sitemap.xml
