@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import asyncio
@@ -13,7 +14,7 @@ from services.ai_service import (
     get_gemini_outfit_recommendations,
     get_voyage_query_embedding,
 )
-from fastapi_cache.decorator import cache
+from fastapi_cache import FastAPICache
 from beanie import PydanticObjectId
 
 recommend_router = APIRouter(prefix="/recommend", tags=["Recommendation"])
@@ -96,7 +97,21 @@ CATEGORY_COOLDOWN_MULTIPLIER: dict[str, float] = {
 }
 
 
-#  Route
+RECOMMEND_CACHE_NS = "recommend"
+RECOMMEND_CACHE_TTL = 300  # 5 minutes
+
+
+def _recommend_cache_key(user_id: str, request: RecommendRequest) -> str:
+    """
+    Build the full Redis key for a recommendation result.
+    We do NOT use @cache because fastapi-cache2 skips all non-GET requests.
+    Instead we call the backend directly, so we need the complete key string
+    in the same format the library would use: {prefix}:{namespace}:{body}.
+    """
+    prefix = FastAPICache.get_prefix()
+    body_hash = hashlib.sha256(request.model_dump_json().encode()).hexdigest()[:16]
+    return f"{prefix}:{RECOMMEND_CACHE_NS}:{user_id}:{body_hash}"
+
 
 @recommend_router.post("/")
 async def recommend_outfits(
@@ -104,15 +119,21 @@ async def recommend_outfits(
     current_user: User = Depends(get_current_user),
 ):
     """
-    MVP Outfit Recommendation Pipeline
-
-    Conditions evaluated (MVP):
-      1. Occasion
-      2. Clean / Dirty status       → Vector Search filter
-      3. Category matching          → Category-scoped searches
-      4. Color compatibility        → Gemini prompt rules
-      5. Recently worn items        → Category-aware post-filter
+    MVP Outfit Recommendation Pipeline.
+    Results are cached in Redis for 5 minutes keyed on user + request body.
+    We bypass @cache because fastapi-cache2 ignores POST requests by design.
     """
+    # Check Redis cache first — skip all the expensive work if we have a hit
+    cache_key = _recommend_cache_key(str(current_user.id), request)
+    backend = FastAPICache.get_backend()
+    coder = FastAPICache.get_coder()
+    try:
+        cached = await backend.get(cache_key)
+        if cached is not None:
+            logger.debug("Recommend cache HIT for key %s", cache_key)
+            return coder.decode(cached)
+    except Exception as exc:
+        logger.warning("Recommend cache read failed, proceeding without cache: %s", exc)
 
     #  1. Build the semantic query
     query_parts = []
@@ -384,7 +405,16 @@ async def recommend_outfits(
                     used_fullbody_ids.add(d["_id"])
             validated_outfits.append({"items": valid_docs, "reason": reason})
 
-    return {
+    result = {
         "outfits": validated_outfits,
         "message": "Outfit recommendations generated successfully.",
     }
+
+    # Store in Redis so the next identical request is instant
+    try:
+        await backend.set(cache_key, coder.encode(result), RECOMMEND_CACHE_TTL)
+        logger.debug("Recommend result cached with key %s", cache_key)
+    except Exception as exc:
+        logger.warning("Recommend cache write failed: %s", exc)
+
+    return result
