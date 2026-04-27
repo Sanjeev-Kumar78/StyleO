@@ -1,9 +1,12 @@
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_BACKEND_URL: http://localhost:8080
     container_name: styleo-frontend
-    expose:
-      - "80"
+    ports:
+      - "4173:4173"
     networks:
       - styleo-net
     restart: unless-stopped
@@ -15,7 +18,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost/",
+          "http://localhost:4173/",
         ]
       interval: 30s
       timeout: 3s
@@ -27,10 +30,15 @@ services:
     container_name: styleo-backend
     env_file:
       - backend/.env
+    environment:
+      FRONTEND_URL: http://localhost:4173
     command: >
       uv run uvicorn main:app --host 0.0.0.0 --port 8080
+    ports:
+      - "8080:8080"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - styleo-net
     restart: unless-stopped
@@ -41,9 +49,10 @@ services:
     env_file:
       - backend/.env
     command: >
-      uv sync && uv run taskiq worker workers.main:broker
+      uv run taskiq worker workers.main:broker
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - styleo-net
     restart: unless-stopped
@@ -65,6 +74,12 @@ services:
       - redis_data:/data
     networks:
       - styleo-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   redis-insight:

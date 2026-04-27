@@ -1,26 +1,39 @@
+import asyncio
 import ctypes
 import io
 import os
 import logging
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from rembg import remove, new_session
 from core.config import settings
 
-# Set up logging
 logger = logging.getLogger(__name__)
 
+# Keep ORT single-threaded so it doesn't fight uvicorn workers for cores
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["ORT_TENSORRT_FP16_ENABLE"] = "1"
-os.environ.setdefault("ORT_LOG_SEVERITY_LEVEL", "3")  # suppress ORT verbosity
+os.environ.setdefault("ORT_LOG_SEVERITY_LEVEL", "3")  # silence ORT noise
+
+# Dedicated thread pool for rembg inference so we never block the event loop
+_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="rembg")
+
+# Sessions are None at startup and get filled in by preload_models().
+# We never initialise them at import time because the download (~100 MB each)
+# would block the first request and blow past the 30 s timeout.
+generic_session = None   # u2net            plain cloth / direct upload
+outfit_session  = None   # u2net_cloth_seg  segmenting worn outfits
+
+_models_ready: bool = False              # flips to True once both sessions are live
+_preload_task: asyncio.Task | None = None  # strong reference so GC won't kill the task
 
 
 def _is_cuda_runtime_available() -> bool:
     """
-    Probe CUDA runtime libraries before handing them to ONNXRuntime.
-    - Windows: checks for the required .dll files in the DLL search path.
-    - Linux/macOS: checks for the equivalent .so files via ctypes.CDLL.
-    Returns True only when the libraries can actually be loaded.
+    Try to load the CUDA shared libraries before passing them to ONNXRuntime.
+    On Windows we look for .dll files; on Linux/macOS for the matching .so files.
+    Returns True only if every required library actually loads.
     """
     if os.name == "nt":
         required = ("cublasLt64_12.dll", "cudart64_12.dll")
@@ -39,59 +52,106 @@ def _is_cuda_runtime_available() -> bool:
 
 def _build_providers() -> list[str]:
     """
-    Build the ONNXRuntime execution-provider list from .env config.
-    CUDA is prepended only when REMBG_ENABLE_GPU=true AND the runtime
-    libs are actually present. CPUExecutionProvider is always the last
-    entry so ORT can fall back automatically.
+    Decide which ONNXRuntime execution providers to use.
+    GPU is only enabled when REMBG_ENABLE_GPU=true *and* the CUDA libs are
+    actually present on this machine. CPU is always the last fallback so ORT
+    can degrade gracefully without crashing.
     """
     if settings.REMBG_ENABLE_GPU:
         if _is_cuda_runtime_available():
-            logger.info("REMBG_ENABLE_GPU=true and CUDA runtime found — using GPU.")
+            logger.info("REMBG_ENABLE_GPU=true and CUDA runtime found  using GPU.")
             return ["CUDAExecutionProvider", "CPUExecutionProvider"]
         else:
             logger.warning(
-                "REMBG_ENABLE_GPU=true but CUDA runtime libs are missing — "
+                "REMBG_ENABLE_GPU=true but CUDA runtime libs are missing  "
                 "falling back to CPU only."
             )
     else:
-        logger.info("REMBG_ENABLE_GPU not set — using CPU only.")
+        logger.info("REMBG_ENABLE_GPU not set  using CPU only.")
 
     return ["CPUExecutionProvider"]
 
 
-providers = _build_providers()
-
-
-def _init_session(model_name: str):
+def _blocking_init_session(model_name: str, providers: list[str]):
+    """
+    Download the ONNX weights if they aren't cached yet, then build the session.
+    This is intentionally a plain blocking function it runs inside the thread
+    pool, never on the asyncio event loop.
+    """
     try:
-        active_session = new_session(model_name, providers=providers)
+        session = new_session(model_name, providers=providers)
         logger.info(
             "Initialized rembg session for model %s. Active providers: %s",
             model_name,
-            active_session.inner_session.get_providers(),
+            session.inner_session.get_providers(),
         )
-        return active_session
-    except Exception as e:
+        return session
+    except Exception as exc:
         logger.warning(
-            "Failed to initialize model %s with requested providers, falling back to CPU: %s",
+            "Failed to initialize model %s with requested providers, "
+            "falling back to CPU: %s",
             model_name,
-            e,
+            exc,
         )
         return new_session(model_name, providers=["CPUExecutionProvider"])
 
 
-generic_session = _init_session('u2net')
-outfit_session = _init_session('u2net_cloth_seg')
+async def preload_models() -> None:
+    """
+    Download and warm up both rembg models in the background.
+
+    This is meant to be scheduled as a fire-and-forget task during FastAPI
+    startup so the server comes online immediately. Any request that arrives
+    while the models are still loading will get a 503 via models_ready().
+    """
+    global generic_session, outfit_session, _models_ready, _preload_task
+
+    if _models_ready:
+        return
+
+    logger.info("Starting background preload of rembg models ...")
+    loop = asyncio.get_event_loop()
+    providers = _build_providers()
+
+    try:
+        # Download both models at the same time rather than one after the other
+        generic_session, outfit_session = await asyncio.gather(
+            loop.run_in_executor(_executor, _blocking_init_session, "u2net", providers),
+            loop.run_in_executor(_executor, _blocking_init_session, "u2net_cloth_seg", providers),
+        )
+        _models_ready = True
+        logger.info("rembg models preloaded and ready.")
+    except Exception as exc:
+        logger.error("rembg preload failed: %s", exc)
+        # _models_ready stays False so callers keep getting 503 until a restart
+
+
+def schedule_preload() -> None:
+    """
+    Kick off preload_models() as a background task and return immediately.
+    Call this inside the FastAPI lifespan after the event loop is running.
+    We store the task reference so the garbage collector doesn't cancel it.
+    """
+    global _preload_task
+    _preload_task = asyncio.create_task(preload_models(), name="rembg-preload")
+    logger.info("rembg preload task scheduled (non-blocking).")
+
+
+def models_ready() -> bool:
+    """Returns True only when both rembg sessions have been loaded successfully."""
+    return _models_ready
 
 
 def _prepare_image(image_bytes: bytes) -> Image.Image:
     image = Image.open(io.BytesIO(image_bytes))
-    if image.mode != 'RGB' and image.mode != 'RGBA':
-        image = image.convert('RGB')
+    if image.mode not in ("RGB", "RGBA"):
+        image = image.convert("RGB")
     return image
 
 
-def _extract_components(alpha_mask: Image.Image, min_area_ratio: float = 0.008) -> list[tuple[int, int, int, int]]:
+def _extract_components(
+    alpha_mask: Image.Image, min_area_ratio: float = 0.008
+) -> list[tuple[int, int, int, int]]:
     width, height = alpha_mask.size
     alpha = alpha_mask.load()
     visited: set[tuple[int, int]] = set()
@@ -132,6 +192,7 @@ def _extract_components(alpha_mask: Image.Image, min_area_ratio: float = 0.008) 
             if area >= min_area:
                 boxes.append((min_x, min_y, max_x + 1, max_y + 1))
 
+    # Sort top-to-bottom so the UI can display items in a natural reading order
     boxes.sort(key=lambda box: (box[1], box[0]))
     return boxes
 
@@ -142,53 +203,59 @@ def _image_to_png_bytes(image: Image.Image) -> bytes:
     return output_buffer.getvalue()
 
 
-try:
-    # This downloads the u2net model on first run to ~/.u2net/
-    session = outfit_session
-except Exception as e:
-    logger.warning(f"Session fallback warning: {e}")
-    session = outfit_session
+# These two are the actual blocking workers that rembg runs inside the thread pool
+def _blocking_remove_generic(image_bytes: bytes) -> bytes:
+    input_image = _prepare_image(image_bytes)
+    output_image = remove(input_image, session=generic_session)
+    return _image_to_png_bytes(output_image)
 
 
-def remove_background_generic(image_bytes: bytes) -> bytes:
+def _blocking_segment_outfit(image_bytes: bytes) -> bytes:
+    input_image = _prepare_image(image_bytes)
+    output_image = remove(input_image, session=outfit_session)
+    return _image_to_png_bytes(output_image)
+
+
+async def remove_background_generic(image_bytes: bytes) -> bytes:
     """
-    Generic cloth image background removal for direct uploads.
-    Uses u2net and returns PNG bytes preserving transparency.
+    Remove the background from a directly uploaded cloth image.
+    Uses the u2net model and returns PNG bytes with transparency preserved.
+    Inference runs in the thread pool so the event loop stays free.
     """
+    loop = asyncio.get_event_loop()
     try:
-        input_image = _prepare_image(image_bytes)
-        output_image = remove(input_image, session=generic_session)
-        return _image_to_png_bytes(output_image)
-    except Exception as e:
-        logger.error(f"Generic background removal failed: {e}")
+        return await loop.run_in_executor(_executor, _blocking_remove_generic, image_bytes)
+    except Exception as exc:
+        logger.error("Generic background removal failed: %s", exc)
         return image_bytes
 
 
-def segment_outfit_image(image_bytes: bytes) -> bytes:
+async def segment_outfit_image(image_bytes: bytes) -> bytes:
     """
-    Segment worn outfit images using u2net cloth segmentation model.
-    Returns one PNG with transparent background where cloth regions are retained.
+    Segment a worn-outfit photo using the u2net cloth segmentation model.
+    Returns a PNG where only the garment regions are kept (transparent background).
     """
+    loop = asyncio.get_event_loop()
     try:
-        input_image = _prepare_image(image_bytes)
-        output_image = remove(input_image, session=outfit_session)
-        return _image_to_png_bytes(output_image)
-    except Exception as e:
-        logger.error(f"Outfit segmentation failed: {e}")
+        return await loop.run_in_executor(_executor, _blocking_segment_outfit, image_bytes)
+    except Exception as exc:
+        logger.error("Outfit segmentation failed: %s", exc)
         return image_bytes
 
 
-def extract_outfit_candidates(image_bytes: bytes, max_candidates: int = 6) -> list[bytes]:
+async def extract_outfit_candidates(
+    image_bytes: bytes, max_candidates: int = 6
+) -> list[bytes]:
     """
-    Build per-item candidate crops from a segmented outfit image.
-    Components are sorted top-to-bottom to keep stable UI order.
+    Segment an outfit photo and return individual garment crops as PNG bytes.
+    Components are sorted top-to-bottom so the UI order stays consistent.
     """
-    segmented_bytes = segment_outfit_image(image_bytes)
+    segmented_bytes = await segment_outfit_image(image_bytes)
 
     try:
         segmented = Image.open(io.BytesIO(segmented_bytes)).convert("RGBA")
-    except Exception as e:
-        logger.error(f"Failed to parse segmented image: {e}")
+    except Exception as exc:
+        logger.error("Failed to parse segmented image: %s", exc)
         return []
 
     alpha = segmented.split()[-1]
@@ -207,13 +274,12 @@ def extract_outfit_candidates(image_bytes: bytes, max_candidates: int = 6) -> li
     return candidates
 
 
-def remove_background(image_bytes: bytes) -> bytes:
+async def remove_background(image_bytes: bytes) -> bytes:
     """
-    Takes a raw image byte string, removes the background using rembg (u2net),
-    and returns a new image byte string (PNG format to preserve transparency).
+    Public alias for remove_background_generic.
 
-    Latency expectation:
-    - GPU (CUDA): ~100-300ms per image
-    - CPU (Standard): ~1.5 - 3 seconds per image
+    Expected latency:
+      GPU (CUDA)    ~100-300 ms per image
+      CPU           ~1.5-3 s per image
     """
-    return remove_background_generic(image_bytes)
+    return await remove_background_generic(image_bytes)

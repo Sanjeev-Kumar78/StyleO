@@ -49,6 +49,7 @@ class ConcurrentQueue {
 }
 
 // Shared singleton — all image hooks share the same rate limiter.
-const imageQueue = new ConcurrentQueue(10);
+// Use a modest concurrency to avoid overwhelming the backend.
+const imageQueue = new ConcurrentQueue(6);
 
 export default imageQueue;

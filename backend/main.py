@@ -9,6 +9,7 @@ from db import init_db, close_db, init_redis, close_redis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from routes import auth_router, user_router, availability_router, wardrobe_router, profile_router
+from services.bg_removal import schedule_preload
 from routes.recommend import recommend_router
 from routes.auth import get_current_user
 from workers.main import broker
@@ -36,6 +37,9 @@ async def lifespan(app: FastAPI):
         await init_db()
         redis_client = await init_redis()
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
+        # Fire-and-forget: download & warm up rembg ONNX models in the background.
+        # The API is immediately available; bg-removal routes return 503 until ready.
+        schedule_preload()
         yield
     except Exception as e:
         logger.exception("Error during startup: %s", e)

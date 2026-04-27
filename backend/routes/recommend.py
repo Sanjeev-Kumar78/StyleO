@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
@@ -202,13 +203,15 @@ async def recommend_outfits(
                 WardrobeItem.is_clean == True
             ).sort("-created_at").limit(limit).to_list()
 
-    topwear = await search_category(ClothingCategory.topwear, limit=5)
-    bottomwear = await search_category(ClothingCategory.bottomwear, limit=5)
-    fullbody = await search_category(ClothingCategory.fullbody, limit=3)
-    outerwear = await search_category(ClothingCategory.outerwear, limit=3)
-    activewear = await search_category(ClothingCategory.activewear, limit=3)
-    footwear = await search_category(ClothingCategory.footwear, limit=3)
-    accessories = await search_category(ClothingCategory.accessory, limit=3)
+    topwear, bottomwear, fullbody, outerwear, activewear, footwear, accessories = await asyncio.gather(
+        search_category(ClothingCategory.topwear, limit=5),
+        search_category(ClothingCategory.bottomwear, limit=5),
+        search_category(ClothingCategory.fullbody, limit=3),
+        search_category(ClothingCategory.outerwear, limit=3),
+        search_category(ClothingCategory.activewear, limit=3),
+        search_category(ClothingCategory.footwear, limit=3),
+        search_category(ClothingCategory.accessory, limit=3),
+    )
 
     all_results = (
         topwear + bottomwear + fullbody

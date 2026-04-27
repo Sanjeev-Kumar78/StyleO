@@ -11,7 +11,7 @@ from models.Model import User, WardrobeItem, ClothingCategory, WardrobeIngestion
 from routes.auth import get_current_user
 from services.image_service import preprocess_image, save_image, fetch_image, delete_image
 from services.ai_service import GeminiServiceError, generate_wardrobe_ai_description
-from services.bg_removal import remove_background_generic, extract_outfit_candidates
+from services.bg_removal import remove_background_generic, extract_outfit_candidates, models_ready
 from workers.tasks import generate_and_store_embedding
 from pydantic import BaseModel
 
@@ -93,6 +93,15 @@ class WardrobePageResponse(BaseModel):
     next_last_seen_id: Optional[str] = None
 
 
+def _assert_models_ready() -> None:
+    """Raise 503 when the rembg models are still warming up."""
+    if not models_ready():
+        raise HTTPException(
+            status_code=503,
+            detail="Background-removal models are still loading. Please retry in a moment.",
+        )
+
+
 async def _prepare_direct_images(
     front_image: UploadFile,
     back_image: Optional[UploadFile],
@@ -105,7 +114,7 @@ async def _prepare_direct_images(
     _assert_image_upload(front_image, "front_image")
 
     front_raw = await front_image.read()
-    front_no_bg = remove_background_generic(front_raw)
+    front_no_bg = await remove_background_generic(front_raw)
     front_webp, _ = preprocess_image(front_no_bg)
     front_b64 = _to_data_uri(front_webp)
 
@@ -114,7 +123,7 @@ async def _prepare_direct_images(
     if back_image:
         _assert_image_upload(back_image, "back_image")
         back_raw = await back_image.read()
-        back_no_bg = remove_background_generic(back_raw)
+        back_no_bg = await remove_background_generic(back_raw)
         back_webp, _ = preprocess_image(back_no_bg)
         back_b64 = _to_data_uri(back_webp)
 
@@ -127,6 +136,7 @@ async def analyze_direct_upload(
     back_image: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_user),
 ):
+    _assert_models_ready()
     try:
         _, _, front_b64, back_b64 = await _prepare_direct_images(front_image, back_image)
 
@@ -150,9 +160,10 @@ async def analyze_outfit_photo(
 ):
     _assert_image_upload(image, "image")
 
+    _assert_models_ready()
     try:
         image_raw = await image.read()
-        candidate_images = extract_outfit_candidates(
+        candidate_images = await extract_outfit_candidates(
             image_raw, max_candidates=6)
         if not candidate_images:
             raise HTTPException(
