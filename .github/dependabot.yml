@@ -6,13 +6,35 @@
 
 version: 2
 updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
-   schedule:
-     interval: monthly
-   open-pull-requests-limit: 5
-   commit-message:
-     prefix: "deps(devcontainer): "
-   labels:
-     - "dependencies"
-     - "devcontainer"
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(devcontainer): "
+    labels:
+      - "dependencies"
+      - "devcontainer"
+    groups:
+      devcontainer-deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    groups:
+      frontend-deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    groups:
+      backend-deps:
+        patterns:
+          - "*"
