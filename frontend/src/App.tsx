@@ -21,7 +21,7 @@ import NavBar from "./components/NavBar";
 import Wardrobe from "./pages/Wardrobe";
 import { getAccessToken } from "./services/api";
 import { Analytics } from "@vercel/analytics/react";
-import useBackendWake from "./hooks/useBackendWake";
+import { BackendStatusProvider } from "./context/BackendStatusContext";
 import { useEffect } from "react";
 import { applySeo } from "./seo";
 
@@ -40,11 +40,6 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const isAuthenticated = Boolean(user || getAccessToken());
   const showNavBar = !["/login", "/signup"].includes(location.pathname);
-
-  // Silently wake the backend EC2 instance on every page load.
-  // If the instance is stopped, the Lambda starts it and we retry
-  // using the Retry-After header until it is running.
-  useBackendWake();
 
   useEffect(() => {
     applySeo(location.pathname);
@@ -78,8 +73,10 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <AppContent />
-      <Analytics />
+      <BackendStatusProvider>
+        <AppContent />
+        <Analytics />
+      </BackendStatusProvider>
     </BrowserRouter>
   );
 };

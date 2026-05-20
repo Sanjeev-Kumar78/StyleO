@@ -15,6 +15,8 @@ import api from "../services/api";
 import { useDebounce } from "../hooks/useDebounce";
 import exportedRoutes from "../api/config";
 import { FaArrowLeft } from "react-icons/fa6";
+import { useBackendStatus } from "../context/BackendStatusContext";
+import BackendWakeSlider from "../components/BackendWakeSlider";
 
 interface SignupFormData {
   username: string;
@@ -30,6 +32,7 @@ const Signup: React.FC = () => {
   );
 
   const { signup, googleLogin, user } = useAuth();
+  const { status } = useBackendStatus();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +54,7 @@ const Signup: React.FC = () => {
   >("idle");
 
   useEffect(() => {
-    if (!debouncedUsername || debouncedUsername.length < 3) {
+    if (!debouncedUsername || debouncedUsername.length < 3 || status === "waking") {
       setUsernameStatus("idle");
       return;
     }
@@ -72,7 +75,7 @@ const Signup: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [debouncedUsername, checkUrl]);
+  }, [debouncedUsername, checkUrl, status]);
 
   const onSubmit = async (data: SignupFormData) => {
     setServerError("");
@@ -157,6 +160,7 @@ const Signup: React.FC = () => {
 
         <div className="form-container">
           <Logo className="login-logo" />
+          <BackendWakeSlider />
           <form onSubmit={handleSubmit(onSubmit)} className="login-form">
             <h2 className="form-title">Create an Account</h2>
 
@@ -168,6 +172,7 @@ const Signup: React.FC = () => {
               type="text"
               placeholder="Username"
               className={`form-input ${errors.username ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("username", {
                 required: "Username is required",
                 minLength: {
@@ -211,6 +216,7 @@ const Signup: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`form-input ${errors.email ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -229,6 +235,7 @@ const Signup: React.FC = () => {
               type="password"
               placeholder="Password"
               className={`form-input ${errors.password ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -247,6 +254,7 @@ const Signup: React.FC = () => {
               type="password"
               placeholder="Confirm Password"
               className={`form-input ${errors.confirmPassword ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("confirmPassword", {
                 required: "Please confirm your password",
                 validate: (value) =>
@@ -262,9 +270,15 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               className="submit-button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || status === "waking" || status === "error"}
             >
-              {isSubmitting ? "Creating Account..." : "Create Account"}
+              {isSubmitting
+                ? "Creating Account..."
+                : status === "waking"
+                ? "Waiting for Server..."
+                : status === "error"
+                ? "Server Offline"
+                : "Create Account"}
             </button>
 
             <div className="divider">

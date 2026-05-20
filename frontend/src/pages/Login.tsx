@@ -12,6 +12,8 @@ import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa6";
+import { useBackendStatus } from "../context/BackendStatusContext";
+import BackendWakeSlider from "../components/BackendWakeSlider";
 
 interface LoginFormData {
   email: string;
@@ -26,6 +28,7 @@ const Login: React.FC = () => {
   );
 
   const { login, googleLogin, user } = useAuth();
+  const { status } = useBackendStatus();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,6 +111,7 @@ const Login: React.FC = () => {
         <div className="form-container">
           {/* Logo */}
           <Logo className="login-logo" />
+          <BackendWakeSlider />
           <form onSubmit={handleSubmit(onSubmit)} className="login-form">
             <h2 className="form-title">Login to Your Account</h2>
 
@@ -119,6 +123,7 @@ const Login: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`form-input ${errors.email ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -137,6 +142,7 @@ const Login: React.FC = () => {
               type="password"
               placeholder="Password"
               className={`form-input ${errors.password ? "border-red-500" : ""}`}
+              disabled={status === "waking"}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -164,9 +170,15 @@ const Login: React.FC = () => {
             <button
               type="submit"
               className="submit-button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || status === "waking" || status === "error"}
             >
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting
+                ? "Logging in..."
+                : status === "waking"
+                ? "Waiting for Server..."
+                : status === "error"
+                ? "Server Offline"
+                : "Login"}
             </button>
 
             <div className="divider">
@@ -209,3 +221,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
