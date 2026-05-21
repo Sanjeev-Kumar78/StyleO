@@ -54,7 +54,7 @@ const Signup: React.FC = () => {
   >("idle");
 
   useEffect(() => {
-    if (!debouncedUsername || debouncedUsername.length < 3 || status === "waking") {
+    if (!debouncedUsername || debouncedUsername.length < 3 || status === "waking" || status === "health-check") {
       setUsernameStatus("idle");
       return;
     }
@@ -172,7 +172,7 @@ const Signup: React.FC = () => {
               type="text"
               placeholder="Username"
               className={`form-input ${errors.username ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("username", {
                 required: "Username is required",
                 minLength: {
@@ -216,7 +216,7 @@ const Signup: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`form-input ${errors.email ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -235,7 +235,7 @@ const Signup: React.FC = () => {
               type="password"
               placeholder="Password"
               className={`form-input ${errors.password ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -254,7 +254,7 @@ const Signup: React.FC = () => {
               type="password"
               placeholder="Confirm Password"
               className={`form-input ${errors.confirmPassword ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("confirmPassword", {
                 required: "Please confirm your password",
                 validate: (value) =>
@@ -270,11 +270,11 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               className="submit-button"
-              disabled={isSubmitting || status === "waking" || status === "error"}
+              disabled={isSubmitting || status === "waking" || status === "health-check" || status === "error"}
             >
               {isSubmitting
                 ? "Creating Account..."
-                : status === "waking"
+                : status === "waking" || status === "health-check"
                 ? "Waiting for Server..."
                 : status === "error"
                 ? "Server Offline"

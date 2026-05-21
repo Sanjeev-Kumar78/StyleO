@@ -123,7 +123,7 @@ const Login: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`form-input ${errors.email ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -142,7 +142,7 @@ const Login: React.FC = () => {
               type="password"
               placeholder="Password"
               className={`form-input ${errors.password ? "border-red-500" : ""}`}
-              disabled={status === "waking"}
+              disabled={status === "waking" || status === "health-check"}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -170,11 +170,11 @@ const Login: React.FC = () => {
             <button
               type="submit"
               className="submit-button"
-              disabled={isSubmitting || status === "waking" || status === "error"}
+              disabled={isSubmitting || status === "waking" || status === "health-check" || status === "error"}
             >
               {isSubmitting
                 ? "Logging in..."
-                : status === "waking"
+                : status === "waking" || status === "health-check"
                 ? "Waiting for Server..."
                 : status === "error"
                 ? "Server Offline"
