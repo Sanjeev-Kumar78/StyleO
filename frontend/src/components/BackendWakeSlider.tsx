@@ -48,7 +48,7 @@ export const BackendWakeSlider: React.FC = () => {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
               {/* Pulsing Icon depending on status */}
-              {status === "waking" && (
+              {(status === "waking" || status === "health-check") && (
                 <motion.div
                   animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
                   transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
@@ -86,6 +86,7 @@ export const BackendWakeSlider: React.FC = () => {
                   }}
                 >
                   {status === "waking" && "Waking up StyleO cloud server..."}
+                  {status === "health-check" && "Verifying backend health..."}
                   {status === "ready" && "StyleO is now online!"}
                   {status === "error" && "Server connection delayed"}
                 </span>
@@ -99,6 +100,7 @@ export const BackendWakeSlider: React.FC = () => {
                   }}
                 >
                   {status === "waking" && "AWS EC2 is booting. This takes ~60-90s on first load."}
+                  {status === "health-check" && "Server is running. Waiting for the app to be ready..."}
                   {status === "ready" && "Connected successfully. Syncing closet..."}
                   {status === "error" && "EC2 failed to start within the window. Try a retry pinger."}
                 </span>
@@ -107,7 +109,7 @@ export const BackendWakeSlider: React.FC = () => {
 
             {/* Percentage or Retry Button */}
             <div>
-              {status === "waking" && (
+              {(status === "waking" || status === "health-check") && (
                 <span
                   style={{
                     fontFamily: "var(--font-body)",
