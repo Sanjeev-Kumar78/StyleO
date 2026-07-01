@@ -27,4 +27,5 @@ dependencies = [
     "rembg[gpu]>=2.0.73",
     "onnxruntime-gpu>=1.24.3",
     "voyageai>=0.3.7",
+    "jinja2>=3.1.6",
 ]
