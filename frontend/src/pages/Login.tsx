@@ -12,7 +12,7 @@ import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useBackendStatus } from "../context/BackendStatusContext";
+import { useBackendStatus } from "../hooks/useBackendStatus";
 import BackendWakeSlider from "../components/BackendWakeSlider";
 
 interface LoginFormData {

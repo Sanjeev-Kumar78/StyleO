@@ -199,17 +199,13 @@ export default function UploadItem() {
       setSuccess(null);
     };
 
-  const removeImageSlot =
-    (
-      setter: typeof setFrontImage,
-      slot: ImageSlot,
-      ref: React.RefObject<HTMLInputElement | null>,
-    ) =>
-    () => {
-      if (slot.preview && !slot.b64) URL.revokeObjectURL(slot.preview);
-      setter({ file: null, preview: null, b64: null });
-      if (ref.current) ref.current.value = "";
-    };
+  const clearImageSlot = (
+    setter: React.Dispatch<React.SetStateAction<ImageSlot>>,
+    slot: ImageSlot,
+  ) => {
+    if (slot.preview && !slot.b64) URL.revokeObjectURL(slot.preview);
+    setter({ file: null, preview: null, b64: null });
+  };
 
   const handleModeChange = (mode: UploadMode) => {
     setUploadMode(mode);
@@ -529,18 +525,20 @@ export default function UploadItem() {
                   label="Front"
                   slot={frontImage}
                   onFile={setImageSlot(setFrontImage)}
-                  onRemove={removeImageSlot(
-                    setFrontImage,
-                    frontImage,
-                    frontRef,
-                  )}
+                  onRemove={() => {
+                    clearImageSlot(setFrontImage, frontImage);
+                    if (frontRef.current) frontRef.current.value = "";
+                  }}
                   inputRef={frontRef}
                 />
                 <UploadImageSlot
                   label="Back (optional)"
                   slot={backImage}
                   onFile={setImageSlot(setBackImage)}
-                  onRemove={removeImageSlot(setBackImage, backImage, backRef)}
+                  onRemove={() => {
+                    clearImageSlot(setBackImage, backImage);
+                    if (backRef.current) backRef.current.value = "";
+                  }}
                   inputRef={backRef}
                 />
               </div>
@@ -559,7 +557,8 @@ export default function UploadItem() {
                     setForm(INITIAL_FORM);
                   }}
                   onRemove={() => {
-                    removeImageSlot(setOutfitImage, outfitImage, outfitRef)();
+                    clearImageSlot(setOutfitImage, outfitImage);
+                    if (outfitRef.current) outfitRef.current.value = "";
                     setOutfitCandidates([]);
                     setSelectedCandidateId(null);
                     setAiPrefilled(false);

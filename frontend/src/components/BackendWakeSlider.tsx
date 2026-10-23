@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useBackendStatus } from "../context/BackendStatusContext";
+import { useBackendStatus } from "../hooks/useBackendStatus";
 import { FaServer, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { MdRefresh } from "react-icons/md";
 

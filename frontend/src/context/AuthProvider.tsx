@@ -10,36 +10,52 @@ import {
 import exportedRoutes from "../api/config";
 
 const authUrl = exportedRoutes.auth as string;
+
+const fetchCurrentUser = async (): Promise<User | null> => {
+  try {
+    const response = await api.get(`${authUrl}/me`);
+    return response.data;
+  } catch (error) {
+    const statusCode = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+
+    // Only clear auth state for real auth failures.
+    // Network/gateway errors should not drop a valid in-memory/session token.
+    if (statusCode === 401 || statusCode === 403) {
+      clearAccessToken();
+    }
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const refreshUser = async () => {
     setLoading(true);
-    try {
-      const response = await api.get(`${authUrl}/me`);
-      setUser(response.data);
-    } catch (error) {
-      const statusCode = axios.isAxiosError(error)
-        ? error.response?.status
-        : undefined;
-
-      // Only clear auth state for real auth failures.
-      // Network/gateway errors should not drop a valid in-memory/session token.
-      if (statusCode === 401 || statusCode === 403) {
-        clearAccessToken();
-      }
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    setUser(await fetchCurrentUser());
+    setLoading(false);
   };
 
   useEffect(() => {
-    // Check auth in background - don't block render
-    refreshUser();
+    let isCurrent = true;
+
+    // Check auth in the background. The initial loading state is already true,
+    // so this effect only updates state after the request settles.
+    void fetchCurrentUser().then((currentUser) => {
+      if (isCurrent) {
+        setUser(currentUser);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      isCurrent = false;
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials) => {

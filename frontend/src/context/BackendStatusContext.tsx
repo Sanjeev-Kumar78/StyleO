@@ -1,29 +1,23 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import React, { useEffect, useEffectEvent, useState, useRef } from "react";
 import { BACKEND_BASE_URL } from "../services/api";
-
-export type BackendStatus = "idle" | "waking" | "health-check" | "ready" | "error";
-
-interface BackendStatusContextType {
-  status: BackendStatus;
-  progress: number;
-  isWaking: boolean;
-  triggerWake: () => void;
-}
-
-const BackendStatusContext = createContext<BackendStatusContextType | undefined>(undefined);
+import {
+  BackendStatusContext,
+  type BackendStatus,
+} from "./backendStatusStore";
 
 const WAKE_URL = "https://9qk1chspm2.execute-api.us-east-2.amazonaws.com/prod/wake";
 const HEALTH_URL = `${BACKEND_BASE_URL}/health`;
 const MAX_RETRY_MS = 5 * 60 * 1000;
 const SIMULATED_BOOT_DURATION_MS = 75 * 1000; // 75 seconds estimated cold start
 const HEALTH_POLL_MS = 5_000; // 5 seconds between /health polls
+const getCurrentTime = () => Date.now();
 
 export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [status, setStatus] = useState<BackendStatus>("idle");
   const [progress, setProgress] = useState(0);
 
-  const pollTimeoutRef = useRef<any | null>(null);
-  const progressIntervalRef = useRef<any | null>(null);
+  const pollTimeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const startedRef = useRef<number>(0);
   const isCancelledRef = useRef<boolean>(false);
 
@@ -117,7 +111,7 @@ export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // Retry if within time budget
-    const elapsed = Date.now() - startedRef.current;
+    const elapsed = getCurrentTime() - startedRef.current;
     if (!isCancelledRef.current && elapsed + HEALTH_POLL_MS < MAX_RETRY_MS) {
       pollTimeoutRef.current = setTimeout(() => pollHealth(false), HEALTH_POLL_MS);
     } else if (!isCancelledRef.current) {
@@ -153,7 +147,7 @@ export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Respect Retry-After header or default to 15s
         const retryAfter = parseInt(res.headers.get("Retry-After") ?? "15", 10);
-        const elapsed = Date.now() - startedRef.current;
+        const elapsed = getCurrentTime() - startedRef.current;
 
         if (elapsed + retryAfter * 1000 < MAX_RETRY_MS) {
           pollTimeoutRef.current = setTimeout(ping, retryAfter * 1000);
@@ -167,7 +161,7 @@ export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({
         cleanTimers();
         setStatus("error");
       }
-    } catch (err) {
+    } catch {
       // Network failure
       if (!isCancelledRef.current) {
         cleanTimers();
@@ -179,15 +173,20 @@ export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({
   const triggerWake = () => {
     cleanTimers();
     isCancelledRef.current = false;
-    startedRef.current = Date.now();
+    startedRef.current = getCurrentTime();
     setProgress(0);
     setStatus("idle");
-    ping();
+    void ping();
   };
 
-  useEffect(() => {
+  const startInitialWake = useEffectEvent(() => {
     isCancelledRef.current = false;
-    triggerWake();
+    startedRef.current = getCurrentTime();
+    void ping();
+  });
+
+  useEffect(() => {
+    startInitialWake();
 
     return () => {
       isCancelledRef.current = true;
@@ -202,12 +201,4 @@ export const BackendStatusProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </BackendStatusContext.Provider>
   );
-};
-
-export const useBackendStatus = () => {
-  const context = useContext(BackendStatusContext);
-  if (!context) {
-    throw new Error("useBackendStatus must be used within a BackendStatusProvider");
-  }
-  return context;
 };

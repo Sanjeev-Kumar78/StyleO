@@ -1,6 +1,6 @@
 import "../styles/Login.css";
-import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import F1 from "../assets/F1.jpg";
 import F2 from "../assets/F2.jpg";
@@ -15,7 +15,7 @@ import api from "../services/api";
 import { useDebounce } from "../hooks/useDebounce";
 import exportedRoutes from "../api/config";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useBackendStatus } from "../context/BackendStatusContext";
+import { useBackendStatus } from "../hooks/useBackendStatus";
 import BackendWakeSlider from "../components/BackendWakeSlider";
 
 interface SignupFormData {
@@ -40,42 +40,57 @@ const Signup: React.FC = () => {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<SignupFormData>();
 
   // username availability check
   const checkUrl = exportedRoutes.check as string;
-  const usernameValue = watch("username", "");
+  const usernameValue = useWatch({ control, name: "username", defaultValue: "" });
+  const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
   const debouncedUsername = useDebounce(usernameValue, 300);
-  const [usernameStatus, setUsernameStatus] = useState<
-    "idle" | "checking" | "available" | "taken"
-  >("idle");
+  const canCheckUsername =
+    debouncedUsername.length >= 3 &&
+    status !== "waking" &&
+    status !== "health-check";
+  const usernameCheckKey = useMemo(
+    () => ({ status, username: debouncedUsername }),
+    [status, debouncedUsername],
+  );
+  const [usernameCheck, setUsernameCheck] = useState<{
+    key: typeof usernameCheckKey;
+    status: "idle" | "available" | "taken";
+  } | null>(null);
+  const usernameStatus = !canCheckUsername
+    ? "idle"
+    : usernameCheck?.key === usernameCheckKey
+      ? usernameCheck.status
+      : "checking";
 
   useEffect(() => {
-    if (!debouncedUsername || debouncedUsername.length < 3 || status === "waking" || status === "health-check") {
-      setUsernameStatus("idle");
-      return;
-    }
+    if (!canCheckUsername) return;
+
     let cancelled = false;
-    setUsernameStatus("checking");
-    api
+    void api
       .get(`${checkUrl}/username-available`, {
         params: { username: debouncedUsername },
       })
       .then((res) => {
         if (!cancelled) {
-          setUsernameStatus(res.data.available ? "available" : "taken");
+          setUsernameCheck({
+            key: usernameCheckKey,
+            status: res.data.available ? "available" : "taken",
+          });
         }
       })
       .catch(() => {
-        if (!cancelled) setUsernameStatus("idle");
+        if (!cancelled) setUsernameCheck({ key: usernameCheckKey, status: "idle" });
       });
     return () => {
       cancelled = true;
     };
-  }, [debouncedUsername, checkUrl, status]);
+  }, [canCheckUsername, checkUrl, debouncedUsername, usernameCheckKey]);
 
   const onSubmit = async (data: SignupFormData) => {
     setServerError("");
@@ -258,7 +273,7 @@ const Signup: React.FC = () => {
               {...register("confirmPassword", {
                 required: "Please confirm your password",
                 validate: (value) =>
-                  value === watch("password") || "Passwords do not match",
+                  value === passwordValue || "Passwords do not match",
               })}
             />
             {errors.confirmPassword && (
