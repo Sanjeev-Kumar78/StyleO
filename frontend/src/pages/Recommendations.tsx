@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import useAuthenticatedImage from "../hooks/useAuthenticatedImage";
 import api from "../services/api";
+import "../styles/Recommendations.css";
 
-/*  Types  */
 interface OutfitItem {
   _id: string;
   category: string;
@@ -22,7 +22,6 @@ interface OutfitRecommendation {
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/*  Component  */
 export default function Recommendations() {
   const [occasion, setOccasion] = useState("");
   const [preferences, setPreferences] = useState("");
@@ -30,28 +29,17 @@ export default function Recommendations() {
   const [outfits, setOutfits] = useState<OutfitRecommendation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Font injection
-  useEffect(() => {
-    const id = "rec-fonts";
-    if (!document.getElementById(id)) {
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setOutfits(null);
+
     try {
       const res = await api.post("/recommend/", { occasion, preferences });
       const data = res.data.outfits ?? [];
       setOutfits(data);
+
       if (data.length === 0) {
         setError(
           res.data.message ||
@@ -73,58 +61,24 @@ export default function Recommendations() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0e0e0e",
-        fontFamily: "'Manrope', sans-serif",
-        color: "#e5e2e1",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
-          padding: "clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2rem)",
-        }}
-      >
-        {/*  Back Link  */}
+    <main className="rec-root">
+      <div className="rec-container">
         <motion.div
+          className="rec-back-wrap"
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          style={{ marginBottom: "3rem" }}
         >
-          <Link
-            to="/dashboard"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              color: "#8c947c",
-              textDecoration: "none",
-              fontSize: "0.8rem",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              fontWeight: 500,
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              ((e.target as HTMLElement).style.color = "#a3e635")
-            }
-            onMouseLeave={(e) =>
-              ((e.target as HTMLElement).style.color = "#8c947c")
-            }
-          >
+          <Link className="rec-back-link" to="/dashboard">
             <svg
-              width="14"
-              height="14"
+              className="rec-icon rec-back-icon"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <line x1="19" y1="12" x2="5" y2="12" />
               <polyline points="12 19 5 12 12 5" />
@@ -133,206 +87,69 @@ export default function Recommendations() {
           </Link>
         </motion.div>
 
-        {/*  Hero Header  */}
-        <motion.div
+        <motion.header
+          className="rec-hero"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-          style={{ marginBottom: "3.5rem" }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <div
-              style={{
-                width: "2rem",
-                height: "1px",
-                background: "#a3e635",
-              }}
-            />
-            <span
-              style={{
-                fontSize: "0.72rem",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "#a3e635",
-                fontWeight: 600,
-              }}
-            >
-              AI Stylist
-            </span>
+          <div className="rec-eyebrow">
+            <span className="rec-eyebrow-line" aria-hidden="true" />
+            <span className="rec-eyebrow-text">AI Stylist</span>
           </div>
 
-          <h1
-            style={{
-              fontFamily: "'Noto Serif', serif",
-              fontSize: "clamp(2.2rem, 5vw, 3.75rem)",
-              fontWeight: 300,
-              lineHeight: 1.12,
-              letterSpacing: "-0.02em",
-              color: "#e5e2e1",
-              margin: 0,
-              marginBottom: "1rem",
-            }}
-          >
-            Your personal{" "}
-            <em
-              style={{
-                color: "#a3e635",
-                fontStyle: "italic",
-                fontWeight: 400,
-              }}
-            >
-              outfit
-            </em>{" "}
-            curator
+          <h1 className="rec-title">
+            Your personal <em>outfit</em> curator
           </h1>
-
-          <p
-            style={{
-              color: "#8c947c",
-              fontSize: "0.95rem",
-              lineHeight: 1.65,
-              maxWidth: "520px",
-              margin: 0,
-            }}
-          >
+          <p className="rec-subtitle">
             Tell us where you're going and what vibe you're looking for. We'll
             craft the perfect look from your clean wardrobe items.
           </p>
-        </motion.div>
+        </motion.header>
 
-        {/*  Input Form  */}
         <motion.form
+          className="rec-form"
           onSubmit={handleGenerate}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
-          style={{
-            background: "#1c1b1b",
-            borderRadius: "1rem",
-            padding: "clamp(1.25rem, 3vw, 2rem)",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr auto",
-            gap: "1rem",
-            alignItems: "end",
-            marginBottom: "4rem",
-          }}
         >
-          {/* Occasion */}
-          <label
-            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#8c947c",
-                fontWeight: 600,
-              }}
-            >
-              Occasion
-            </span>
+          <label className="rec-field">
+            <span className="rec-label">Occasion</span>
             <input
+              className="rec-input"
               type="text"
               placeholder="e.g., Casual brunch, Office, Date night"
               value={occasion}
               onChange={(e) => setOccasion(e.target.value)}
-              style={{
-                background: "#353534",
-                border: "none",
-                borderBottom: "1px solid #424936",
-                borderRadius: "0.375rem 0.375rem 0 0",
-                padding: "0.75rem 1rem",
-                color: "#e5e2e1",
-                fontSize: "0.9rem",
-                outline: "none",
-                fontFamily: "'Manrope', sans-serif",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => (e.target.style.borderBottomColor = "#a3e635")}
-              onBlur={(e) => (e.target.style.borderBottomColor = "#424936")}
             />
           </label>
 
-          {/* Preferences */}
-          <label
-            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#8c947c",
-                fontWeight: 600,
-              }}
-            >
-              Style Preferences
-            </span>
+          <label className="rec-field">
+            <span className="rec-label">Style Preferences</span>
             <input
+              className="rec-input"
               type="text"
               placeholder="e.g., Minimalist, All black, Comfortable"
               value={preferences}
               onChange={(e) => setPreferences(e.target.value)}
-              style={{
-                background: "#353534",
-                border: "none",
-                borderBottom: "1px solid #424936",
-                borderRadius: "0.375rem 0.375rem 0 0",
-                padding: "0.75rem 1rem",
-                color: "#e5e2e1",
-                fontSize: "0.9rem",
-                outline: "none",
-                fontFamily: "'Manrope', sans-serif",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => (e.target.style.borderBottomColor = "#a3e635")}
-              onBlur={(e) => (e.target.style.borderBottomColor = "#424936")}
             />
           </label>
 
-          {/* Submit */}
           <button
+            className={`rec-submit${loading ? " rec-submit--loading" : ""}`}
             type="submit"
             disabled={loading}
-            style={{
-              background: loading
-                ? "#424936"
-                : "linear-gradient(135deg, #ccff80, #a3e635)",
-              color: "#121f00",
-              border: "none",
-              borderRadius: "0.375rem",
-              padding: "0.75rem 1.5rem",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              fontFamily: "'Manrope', sans-serif",
-              letterSpacing: "0.05em",
-              cursor: loading ? "not-allowed" : "pointer",
-              whiteSpace: "nowrap",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              transition: "all 0.2s",
-              boxShadow: loading ? "none" : "0 0 20px rgba(163,230,53,0.15)",
-            }}
           >
             {loading ? (
               <>
                 <svg
-                  width="16"
-                  height="16"
+                  className="rec-icon rec-spinner"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  style={{ animation: "spin 1s linear infinite" }}
+                  aria-hidden="true"
                 >
                   <polyline points="23 4 23 10 17 10" />
                   <polyline points="1 20 1 14 7 14" />
@@ -343,12 +160,12 @@ export default function Recommendations() {
             ) : (
               <>
                 <svg
-                  width="16"
-                  height="16"
+                  className="rec-icon"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
+                  aria-hidden="true"
                 >
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
@@ -358,80 +175,37 @@ export default function Recommendations() {
           </button>
         </motion.form>
 
-        {/*  Error  */}
         <AnimatePresence>
           {error && (
             <motion.div
+              className="rec-error"
               key="error"
+              role="alert"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              style={{
-                background: "rgba(147,0,10,0.2)",
-                border: "1px solid rgba(255,180,171,0.2)",
-                borderRadius: "0.75rem",
-                padding: "1rem 1.25rem",
-                color: "#ffb4ab",
-                fontSize: "0.88rem",
-                marginBottom: "2rem",
-                lineHeight: 1.55,
-              }}
             >
               {error}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/*  Loading skeleton  */}
         <AnimatePresence>
           {loading && (
             <motion.div
+              className="rec-loading"
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
             >
               {[1, 2].map((n) => (
-                <div
-                  key={n}
-                  style={{
-                    background: "#1c1b1b",
-                    borderRadius: "1rem",
-                    padding: "2rem",
-                    animation: "pulse 1.6s ease-in-out infinite",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "120px",
-                      height: "24px",
-                      background: "#2a2a2a",
-                      borderRadius: "0.375rem",
-                      marginBottom: "1rem",
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: "70%",
-                      height: "14px",
-                      background: "#2a2a2a",
-                      borderRadius: "0.25rem",
-                      marginBottom: "1.5rem",
-                    }}
-                  />
-                  <div style={{ display: "flex", gap: "1rem" }}>
+                <div className="rec-skeleton" key={n}>
+                  <div className="rec-skeleton-title" />
+                  <div className="rec-skeleton-copy" />
+                  <div className="rec-skeleton-items">
                     {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        style={{
-                          width: "160px",
-                          height: "200px",
-                          flexShrink: 0,
-                          background: "#2a2a2a",
-                          borderRadius: "0.75rem",
-                        }}
-                      />
+                      <div className="rec-skeleton-item" key={i} />
                     ))}
                   </div>
                 </div>
@@ -440,42 +214,25 @@ export default function Recommendations() {
           )}
         </AnimatePresence>
 
-        {/*  Results  */}
         <AnimatePresence>
           {outfits && outfits.length > 0 && (
             <motion.div
+              className="rec-results"
               key="results"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "2.5rem",
-              }}
             >
               {outfits.map((outfit, idx) => (
-                <OutfitCard
-                  key={idx}
-                  outfit={outfit}
-                  index={idx}
-                />
+                <OutfitCard key={idx} outfit={outfit} index={idx} />
               ))}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Spin animation */}
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-        .item-thumb:hover { transform: scale(1.02); }
-      `}</style>
-    </div>
+    </main>
   );
 }
 
-/*  Outfit Card Component  */
 function OutfitCard({
   outfit,
   index,
@@ -484,255 +241,91 @@ function OutfitCard({
   index: number;
 }) {
   return (
-    <motion.div
+    <motion.section
+      className="rec-card"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.55,
         delay: index * 0.12,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      style={{
-        background: "#1c1b1b",
-        borderRadius: "1rem",
-        overflow: "hidden",
+        ease: EASE_OUT_EXPO,
       }}
     >
-      {/* Card Header */}
-      <div
-        style={{
-          padding: "1.75rem 2rem 1.25rem",
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              marginBottom: "0.75rem",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'Noto Serif', serif",
-                fontSize: "1.4rem",
-                fontWeight: 300,
-                color: "#e5e2e1",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Look {index + 1}
-            </span>
-            <span
-              style={{
-                background: "rgba(163,230,53,0.12)",
-                color: "#a3e635",
-                fontSize: "0.65rem",
-                fontWeight: 600,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "999px",
-              }}
-            >
-              AI Curated
-            </span>
+      <div className="rec-card-header">
+        <div className="rec-card-intro">
+          <div className="rec-card-heading">
+            <h2 className="rec-card-title">Look {index + 1}</h2>
+            <span className="rec-badge">AI Curated</span>
           </div>
-
-          {outfit.reason && (
-            <blockquote
-              style={{
-                margin: 0,
-                padding: 0,
-                borderLeft: "2px solid rgba(163,230,53,0.4)",
-                paddingLeft: "0.75rem",
-                color: "#8c947c",
-                fontSize: "0.85rem",
-                fontStyle: "italic",
-                lineHeight: 1.6,
-                maxWidth: "600px",
-              }}
-            >
-              {outfit.reason}
-            </blockquote>
-          )}
+          {outfit.reason && <blockquote className="rec-reason">{outfit.reason}</blockquote>}
         </div>
 
-        <span
-          style={{
-            background: "#201f1f",
-            color: "#8c947c",
-            fontSize: "0.7rem",
-            fontWeight: 500,
-            letterSpacing: "0.08em",
-            padding: "0.3rem 0.7rem",
-            borderRadius: "0.375rem",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-          }}
-        >
+        <span className="rec-item-count">
           {outfit.items.length} item{outfit.items.length !== 1 ? "s" : ""}
         </span>
       </div>
 
-      {/* Horizontal item carousel */}
-      <div
-        style={{
-          overflowX: "auto",
-          padding: "0.5rem 1.5rem 2rem",
-          display: "flex",
-          gap: "1rem",
-          scrollbarWidth: "none",
-        }}
-      >
+      <div className="rec-items">
         {outfit.items.map((item) => (
           <ItemThumb key={item._id} item={item} />
         ))}
       </div>
-    </motion.div>
+    </motion.section>
   );
 }
 
-/*  Item Thumbnail  */
 function ItemThumb({ item }: { item: OutfitItem }) {
   const [imgError, setImgError] = useState(false);
   const { imageUrl: imgSrc } = useAuthenticatedImage(item.front_image_id);
 
   return (
-    <div
-      className="item-thumb"
-      style={{
-        flexShrink: 0,
-        width: "160px",
-        background: "#201f1f",
-        borderRadius: "0.75rem",
-        overflow: "hidden",
-        transition: "transform 0.2s ease",
-        cursor: "default",
-      }}
-    >
-      {/* Image area */}
-      <div
-        style={{
-          height: "200px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#201f1f",
-          position: "relative",
-        }}
-      >
+    <article className="rec-item">
+      <div className="rec-item-image-wrap">
         {imgSrc && !imgError ? (
           <img
+            className="rec-item-image"
             src={imgSrc}
             alt={item.item_type}
             onError={() => setImgError(true)}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
             loading="lazy"
           />
         ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "0.5rem",
-              color: "#424936",
-            }}
-          >
+          <div className="rec-item-placeholder">
             <svg
-              width="28"
-              height="28"
+              className="rec-placeholder-icon"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
+              aria-hidden="true"
             >
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
               <polyline points="21 15 16 10 5 21" />
             </svg>
-            <span style={{ fontSize: "0.65rem" }}>No image</span>
+            <span>No image</span>
           </div>
         )}
 
-        {/* Category chip overlay */}
-        <div
-          style={{
-            position: "absolute",
-            top: "0.5rem",
-            left: "0.5rem",
-            background: "rgba(19,19,19,0.75)",
-            backdropFilter: "blur(8px)",
-            color: "#c2cab0",
-            fontSize: "0.6rem",
-            fontWeight: 600,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            padding: "0.2rem 0.5rem",
-            borderRadius: "999px",
-          }}
-        >
-          {item.category}
-        </div>
+        <span className="rec-category">{item.category}</span>
       </div>
 
-      {/* Item info */}
-      <div style={{ padding: "0.75rem 0.875rem" }}>
-        <p
-          style={{
-            margin: 0,
-            color: "#e5e2e1",
-            fontSize: "0.78rem",
-            fontWeight: 500,
-            textTransform: "capitalize",
-            letterSpacing: "0.01em",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            marginBottom: "0.2rem",
-          }}
-        >
-          {item.item_type}
-        </p>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+      <div className="rec-item-details">
+        <p className="rec-item-name">{item.item_type}</p>
+        <div className="rec-item-meta">
           {item.color && (
-            <div
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: item.color.toLowerCase(),
-                border: "1px solid rgba(255,255,255,0.1)",
-                flexShrink: 0,
-              }}
+            <span
+              className="rec-color-dot"
+              style={{ backgroundColor: item.color.toLowerCase() }}
+              aria-hidden="true"
             />
           )}
-          <p
-            style={{
-              margin: 0,
-              color: "#8c947c",
-              fontSize: "0.7rem",
-              textTransform: "capitalize",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
+          <p className="rec-item-description">
             {item.color}
             {item.material ? ` · ${item.material}` : ""}
           </p>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

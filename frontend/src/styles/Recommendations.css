@@ -1,0 +1,277 @@
+@reference "tailwindcss";
+
+@keyframes recSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes recPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Page layout */
+.rec-root {
+  @apply min-h-screen bg-(--bg) text-(--text-primary) font-(family-name:--font-body)
+         transition-colors duration-300;
+}
+
+.rec-container {
+  @apply mx-auto max-w-[68.75rem]
+         p-[clamp(1.5rem,4vw,3.5rem)_clamp(1rem,4vw,2rem)];
+}
+
+.rec-back-wrap {
+  @apply mb-12;
+}
+
+.rec-back-link {
+  @apply inline-flex items-center gap-1.5 text-(--text-dim) no-underline
+         font-medium text-[0.8rem] tracking-[0.08em] uppercase
+         transition-colors duration-200 hover:text-(--accent);
+}
+
+.rec-icon {
+  @apply size-4 shrink-0;
+}
+
+.rec-back-icon {
+  @apply size-[0.875rem];
+}
+
+/* Header */
+.rec-hero {
+  @apply mb-14;
+}
+
+.rec-eyebrow {
+  @apply flex items-center gap-3 mb-5;
+}
+
+.rec-eyebrow-line {
+  @apply h-px w-8 shrink-0 bg-(--accent);
+}
+
+.rec-eyebrow-text {
+  @apply text-(--accent) text-[0.72rem] font-semibold tracking-[0.2em] uppercase;
+}
+
+.rec-title {
+  @apply mb-4 text-(--text-primary) font-(family-name:--font-display)
+         text-[clamp(2.2rem,5vw,3.75rem)] font-light leading-[1.12] tracking-[-0.02em];
+}
+
+.rec-title em {
+  @apply text-(--accent) italic font-normal;
+}
+
+.rec-subtitle {
+  @apply max-w-[32.5rem] text-(--text-dim) text-[0.95rem] leading-[1.65];
+}
+
+/* Recommendation form */
+.rec-form {
+  @apply mb-16 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-4
+         rounded-2xl bg-(--bg-elevated) p-[clamp(1.25rem,3vw,2rem)];
+}
+
+.rec-field {
+  @apply flex min-w-0 flex-col gap-2;
+}
+
+.rec-label {
+  @apply text-(--text-dim) text-[0.72rem] font-semibold tracking-[0.12em] uppercase;
+}
+
+.rec-input {
+  @apply w-full rounded-t-md border-0 border-b border-(--border-hi) bg-(--surface-2)
+         px-4 py-3 text-(--text-primary) text-[0.9rem]
+         font-(family-name:--font-body) outline-none transition-colors duration-200
+         focus:border-(--accent);
+}
+
+.rec-input::placeholder {
+  @apply text-(--text-dim);
+  opacity: 0.75;
+}
+
+.rec-submit {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md
+         bg-(--accent) px-6 py-3 text-(--accent-text) text-[0.85rem] font-semibold
+         font-(family-name:--font-body) tracking-[0.05em]
+         shadow-[0_0_20px_var(--accent-glow)] transition-all duration-200
+         hover:-translate-y-0.5 hover:shadow-[0_0_28px_var(--accent-glow)]
+         disabled:cursor-not-allowed;
+}
+
+.rec-submit--loading {
+  @apply bg-(--surface-3) shadow-none hover:translate-y-0 hover:shadow-none;
+  color: var(--text-primary);
+}
+
+.rec-spinner {
+  animation: recSpin 1s linear infinite;
+}
+
+/* Empty, error, and loading states */
+.rec-error {
+  @apply mb-8 rounded-xl border border-(--danger-border) bg-(--danger-bg)
+         px-5 py-4 text-(--danger-text) text-[0.88rem] leading-[1.55];
+}
+
+.rec-loading {
+  @apply flex flex-col gap-8;
+}
+
+.rec-skeleton {
+  @apply animate-[recPulse_1.6s_ease-in-out_infinite] rounded-2xl
+         bg-(--bg-elevated) p-8;
+}
+
+.rec-skeleton-title {
+  @apply mb-4 h-6 w-[120px] rounded-md bg-(--surface-2);
+}
+
+.rec-skeleton-copy {
+  @apply mb-6 h-3.5 w-[70%] rounded bg-(--surface-2);
+}
+
+.rec-skeleton-items {
+  @apply flex gap-4 overflow-hidden;
+}
+
+.rec-skeleton-item {
+  @apply h-[200px] w-40 shrink-0 rounded-xl bg-(--surface-2);
+}
+
+/* Recommendation results */
+.rec-results {
+  @apply flex flex-col gap-10;
+}
+
+.rec-card {
+  @apply overflow-hidden rounded-2xl bg-(--bg-elevated);
+}
+
+.rec-card-header {
+  @apply flex items-start justify-between gap-4 px-8 pt-7 pb-5;
+}
+
+.rec-card-intro {
+  @apply min-w-0;
+}
+
+.rec-card-heading {
+  @apply mb-3 flex items-center gap-3;
+}
+
+.rec-card-title {
+  @apply text-(--text-primary) font-(family-name:--font-display)
+         text-[1.4rem] font-light tracking-[-0.01em];
+}
+
+.rec-badge {
+  @apply rounded-full bg-(--accent-badge-bg) px-2.5 py-1 text-(--accent)
+         text-[0.65rem] font-semibold tracking-[0.12em] uppercase;
+}
+
+.rec-reason {
+  @apply m-0 max-w-[37.5rem] border-l-2 border-(--accent-border) pl-3
+         text-(--text-dim) text-[0.85rem] italic leading-relaxed;
+}
+
+.rec-item-count {
+  @apply shrink-0 whitespace-nowrap rounded-md bg-(--surface-1) px-3 py-1.5
+         text-(--text-dim) text-[0.7rem] font-medium tracking-[0.08em];
+}
+
+.rec-items {
+  @apply flex gap-4 overflow-x-auto px-6 pt-2 pb-8;
+  scrollbar-width: none;
+}
+
+.rec-items::-webkit-scrollbar {
+  display: none;
+}
+
+.rec-item {
+  @apply w-40 shrink-0 cursor-default overflow-hidden rounded-xl bg-(--surface-1)
+         transition-transform duration-200 hover:scale-[1.02];
+}
+
+.rec-item-image-wrap {
+  @apply relative flex h-[200px] items-center justify-center bg-(--surface-1);
+}
+
+.rec-item-image {
+  @apply size-full object-cover;
+}
+
+.rec-item-placeholder {
+  @apply flex flex-col items-center gap-2 text-(--text-dim);
+}
+
+.rec-placeholder-icon {
+  @apply size-7;
+}
+
+.rec-item-placeholder span {
+  @apply text-[0.65rem];
+}
+
+.rec-category {
+  @apply absolute top-2 left-2 rounded-full px-2 py-1 text-(--text-primary)
+         text-[0.6rem] font-semibold tracking-[0.1em] uppercase backdrop-blur-md;
+  background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+}
+
+.rec-item-details {
+  @apply px-3.5 py-3;
+}
+
+.rec-item-name {
+  @apply mb-1 truncate text-(--text-primary) text-[0.78rem] font-medium
+         capitalize tracking-[0.01em];
+}
+
+.rec-item-meta {
+  @apply flex min-w-0 items-center gap-1.5;
+}
+
+.rec-color-dot {
+  @apply size-2 shrink-0 rounded-full border border-(--border);
+}
+
+.rec-item-description {
+  @apply truncate text-(--text-dim) text-[0.7rem] capitalize;
+}
+
+@media (max-width: 700px) {
+  .rec-form {
+    @apply grid-cols-1 items-stretch;
+  }
+
+  .rec-submit {
+    @apply justify-center;
+  }
+}
+
+@media (max-width: 480px) {
+  .rec-card-header {
+    @apply px-5 pt-5 pb-4;
+  }
+
+  .rec-card-heading {
+    @apply flex-wrap;
+  }
+
+  .rec-items {
+    @apply px-4;
+  }
+}
