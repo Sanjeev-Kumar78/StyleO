@@ -1,5 +1,6 @@
 # Build stage
-FROM node:25-bookworm-slim
+FROM node:26.12.1-alpine
+RUN apk upgrade --no-cache
 WORKDIR /app
 
 COPY package*.json ./

@@ -30,7 +30,7 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/backend"
     schedule:
       interval: "weekly"
@@ -38,3 +38,8 @@ updates:
       backend-deps:
         patterns:
           - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
